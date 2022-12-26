@@ -81,19 +81,19 @@ const Navigation = (props: Props) => {
   const { afterVerticalNavMenuContentPosition, beforeVerticalNavMenuContentPosition } = themeConfig
 
   // ** Fixes Navigation InfiniteScroll
-  const handleInfiniteScroll = (ref: HTMLElement) => {
-    if (ref) {
-      // @ts-ignore
-      ref._getBoundingClientRect = ref.getBoundingClientRect
+  // const handleInfiniteScroll = (ref: HTMLElement) => {
+  //   if (ref) {
+  //     // @ts-ignore
+  //     ref._getBoundingClientRect = ref.getBoundingClientRect
 
-      ref.getBoundingClientRect = () => {
-        // @ts-ignore
-        const original = ref._getBoundingClientRect()
+  //     ref.getBoundingClientRect = () => {
+  //       // @ts-ignore
+  //       const original = ref._getBoundingClientRect()
 
-        return { ...original, height: Math.floor(original.height) }
-      }
-    }
-  }
+  //       return { ...original, height: Math.floor(original.height) }
+  //     }
+  //   }
+  // }
 
   // ** Scroll Menu
   const scrollMenu = (container: any) => {
@@ -154,7 +154,7 @@ const Navigation = (props: Props) => {
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         {/* @ts-ignore */}
         <ScrollWrapper
-          containerRef={(ref: any) => handleInfiniteScroll(ref)}
+          // containerRef={(ref: any) => handleInfiniteScroll(ref)}
           {...(hidden
             ? {
                 onScroll: (container: any) => scrollMenu(container),

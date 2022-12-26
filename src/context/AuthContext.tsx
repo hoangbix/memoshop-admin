@@ -7,6 +7,8 @@ import { useRouter } from 'next/router'
 // ** Axios
 import axios from 'axios'
 
+import jwt from 'jsonwebtoken'
+
 // ** Config
 import authConfig from 'src/configs/auth'
 
@@ -47,23 +49,29 @@ const AuthProvider = ({ children }: Props) => {
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)!
       if (storedToken) {
         setLoading(true)
-        await axios
-          .get(authConfig.meEndpoint, {
-            headers: {
-              Authorization: storedToken
-            }
-          })
-          .then(async response => {
-            setLoading(false)
-            setUser({ ...response.data.userData })
-          })
-          .catch(() => {
-            localStorage.removeItem('userData')
-            localStorage.removeItem('refreshToken')
-            localStorage.removeItem('accessToken')
-            setUser(null)
-            setLoading(false)
-          })
+
+        const decoded = jwt.decode(storedToken, { complete: true })
+        if (decoded) {
+          // @ts-ignore
+          const { id: userId } = decoded.payload
+          await axios
+            .get(`${authConfig.meEndpoint}/${userId}`, {
+              headers: {
+                Authorization: `Bearer ${storedToken}`
+              }
+            })
+            .then(async response => {
+              setLoading(false)
+              setUser({ ...response.data })
+            })
+            .catch(() => {
+              localStorage.removeItem('userData')
+              localStorage.removeItem('refreshToken')
+              localStorage.removeItem('accessToken')
+              setUser(null)
+              setLoading(false)
+            })
+        }
       } else {
         setLoading(false)
       }
@@ -75,25 +83,33 @@ const AuthProvider = ({ children }: Props) => {
     axios
       .post(authConfig.loginEndpoint, params)
       .then(async res => {
-        window.localStorage.setItem(authConfig.storageTokenKeyName, res.data.accessToken)
+        window.localStorage.setItem(authConfig.storageTokenKeyName, res.data.access_token)
       })
       .then(() => {
-        axios
-          .get(authConfig.meEndpoint, {
-            headers: {
-              Authorization: window.localStorage.getItem(authConfig.storageTokenKeyName)!
-            }
-          })
-          .then(async response => {
-            const returnUrl = router.query.returnUrl
+        const token = window.localStorage.getItem(authConfig.storageTokenKeyName)!
+        const decoded = jwt.decode(token, { complete: true })
 
-            setUser({ ...response.data.userData })
-            await window.localStorage.setItem('userData', JSON.stringify(response.data.userData))
+        if (decoded) {
+          // @ts-ignore
+          const { id: userId } = decoded.payload
 
-            const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+          axios
+            .get(`${authConfig.meEndpoint}/${userId}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
+            .then(async response => {
+              const returnUrl = router.query.returnUrl
 
-            router.replace(redirectURL as string)
-          })
+              setUser({ ...response.data })
+              await window.localStorage.setItem('userData', JSON.stringify(response.data))
+
+              const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+
+              router.replace(redirectURL as string)
+            })
+        }
       })
       .catch(err => {
         if (errorCallback) errorCallback(err)
