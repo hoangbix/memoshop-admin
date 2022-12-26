@@ -6,7 +6,7 @@ export type UserLayoutType = {
 }
 
 export type UsersType = {
-  _id: number
+  id: number
   role: string
   email: string
   status: string
@@ -14,7 +14,8 @@ export type UsersType = {
   company: string
   country: string
   contact: string
-  fullname: string
+  fullName: string
+  username: string
   currentPlan: string
   avatarColor?: ThemeColor
 }

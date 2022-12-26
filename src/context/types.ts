@@ -12,11 +12,11 @@ export type RegisterParams = {
 }
 
 export type UserDataType = {
-  _id: number
+  id: number
   role: string
   email: string
   mobile: string
-  fullname: string
+  fullName: string
   password: string
   avatar: string
 }
