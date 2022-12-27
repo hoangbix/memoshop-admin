@@ -13,7 +13,7 @@ const FallbackSpinner = () => {
         justifyContent: 'center'
       }}
     >
-      <LogoIcon />
+      <LogoIcon width={150} />
       <CircularProgress disableShrink sx={{ mt: 6 }} />
     </Box>
   )

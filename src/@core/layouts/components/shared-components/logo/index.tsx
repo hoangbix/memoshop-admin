@@ -1,8 +1,8 @@
-const LogoIcon = ({ width, height }: { width?: number; height?: number }) => {
+const LogoIcon = ({ width, height }: { width?: number | string; height?: number | string }) => {
   return (
     <svg
-      width={`${width}` || '180'}
-      height={`${height}` || '52'}
+      width={width || '180'}
+      height={height || '52'}
       viewBox='0 0 215 66'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'
