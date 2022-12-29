@@ -31,6 +31,22 @@ export type InvoiceType = {
   invoiceStatus: InvoiceStatus
 }
 
+export type ProductType = {
+  _id: number
+  title: string
+  brand: number
+  category: string
+  color: string
+  description: string
+  images: any
+  price: string
+  quantity: string
+  ratings: any
+  sold: string
+  totalratings: string
+  createdAt: Date | number
+}
+
 export type InvoicePaymentType = {
   iban: string
   totalDue: string

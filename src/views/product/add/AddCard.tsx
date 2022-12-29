@@ -1,593 +1,214 @@
-// ** React Imports
-import { useState, forwardRef, SyntheticEvent, ForwardedRef } from 'react'
+import { useState, forwardRef, useEffect } from 'react'
 
-// ** MUI Imports
 import Card from '@mui/material/Card'
-import Table from '@mui/material/Table'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import Tooltip from '@mui/material/Tooltip'
-import TableRow from '@mui/material/TableRow'
-import Collapse from '@mui/material/Collapse'
-import TableBody from '@mui/material/TableBody'
 import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import InputLabel from '@mui/material/InputLabel'
-import Box, { BoxProps } from '@mui/material/Box'
-import Grid, { GridProps } from '@mui/material/Grid'
-import InputAdornment from '@mui/material/InputAdornment'
-import TableContainer from '@mui/material/TableContainer'
-import { styled, alpha, useTheme } from '@mui/material/styles'
+import Box from '@mui/material/Box'
+import Grid from '@mui/material/Grid'
+import { styled, alpha } from '@mui/material/styles'
 import Select, { SelectChangeEvent } from '@mui/material/Select'
 import MenuItem, { MenuItemProps } from '@mui/material/MenuItem'
-import TableCell, { TableCellBaseProps } from '@mui/material/TableCell'
-import CardContent, { CardContentProps } from '@mui/material/CardContent'
-
-// ** Icon Imports
-import Plus from 'mdi-material-ui/Plus'
-import Close from 'mdi-material-ui/Close'
-
-// ** Third Party Imports
+import CardContent from '@mui/material/CardContent'
+import OutlinedInput from '@mui/material/OutlinedInput'
 import DatePicker from 'react-datepicker'
 
-// ** Configs
-import themeConfig from 'src/configs/themeConfig'
+import Plus from 'mdi-material-ui/Plus'
 
-// ** Types
-import { DateType } from 'src/types/forms/reactDatepickerTypes'
-import { InvoiceClientType } from 'src/types/apps/invoiceTypes'
-
-// ** Custom Component Imports
-import Repeater from 'src/@core/components/repeater'
-
-// ** Styles
+import LogoIcon from 'src/@core/layouts/components/shared-components/logo'
+import { FormControl } from '@mui/material'
 import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-
-interface PickerProps {
-  label?: string
-}
+import FileUploaderRestrictions from 'src/@core/components/upload-file/FileUploaderRestrictions'
+import { fetchCategory } from 'src/store/apps/category'
+import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/store'
 
 interface Props {
   toggleAddCustomerDrawer: () => void
-  invoiceNumber: number
-  clients: InvoiceClientType[] | undefined
-  selectedClient: InvoiceClientType | null
-  setSelectedClient: (val: InvoiceClientType | null) => void
 }
 
-const CustomInput = forwardRef(({ ...props }: PickerProps, ref: ForwardedRef<HTMLElement>) => {
-  return (
-    <TextField
-      size='small'
-      inputRef={ref}
-      sx={{ width: { sm: '250px', xs: '170px' }, '& .MuiInputBase-input': { color: 'text.secondary' } }}
-      {...props}
-    />
-  )
+type DateType = Date | null | undefined
+
+interface CategoryType {
+  _id: string
+  title: string
+  slug: string
+}
+
+const CustomInput = forwardRef((props: any, ref) => {
+  return <TextField fullWidth {...props} inputRef={ref} autoComplete='off' size='small' />
 })
-
-const MUITableCell = styled(TableCell)<TableCellBaseProps>(({ theme }) => ({
-  borderBottom: 0,
-  padding: `${theme.spacing(1, 0)} !important`
-}))
-
-const CalcWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  '&:not(:last-of-type)': {
-    marginBottom: theme.spacing(2)
-  }
-}))
-
-const RepeatingContent = styled(Grid)<GridProps>(({ theme }) => ({
-  paddingRight: 0,
-  display: 'flex',
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
-  '& .col-title': {
-    top: '-1.5rem',
-    position: 'absolute'
-  },
-  '& .MuiInputBase-input': {
-    color: theme.palette.text.secondary
-  },
-  [theme.breakpoints.down('lg')]: {
-    '& .col-title': {
-      top: '0',
-      position: 'relative'
-    }
-  }
-}))
-
-const RepeaterWrapper = styled(CardContent)<CardContentProps>(({ theme }) => ({
-  paddingTop: theme.spacing(12),
-  paddingBottom: theme.spacing(5.5),
-  '& .repeater-wrapper + .repeater-wrapper': {
-    marginTop: theme.spacing(12)
-  }
-}))
-
-const InvoiceAction = styled(Box)<BoxProps>(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'flex-start',
-  padding: theme.spacing(2, 1),
-  borderLeft: `1px solid ${theme.palette.divider}`
-}))
 
 const CustomSelectItem = styled(MenuItem)<MenuItemProps>(({ theme }) => ({
   backgroundColor: 'transparent !important',
-  '&:hover': { backgroundColor: `${alpha(theme.palette.success.main, 0.1)} !important` }
+  padding: '0 !important',
+  '&:hover': { backgroundColor: `${alpha(theme.palette.primary.main, 0.1)} !important` }
 }))
 
-const now = new Date()
-const tomorrowDate = now.setDate(now.getDate() + 7)
+const AddCard = (props: Props) => {
+  const { toggleAddCustomerDrawer } = props
+  const dispatch = useDispatch<AppDispatch>()
 
-const EditCard = (props: Props) => {
-  // ** Props
-  const { clients, invoiceNumber, selectedClient, setSelectedClient, toggleAddCustomerDrawer } = props
+  const [selected, setSelected] = useState<string[]>([])
+  const [date, setDate] = useState<DateType>(null)
 
-  // ** States
-  const [count, setCount] = useState<number>(1)
-  const [selected, setSelected] = useState<string>('')
-  const [issueDate, setIssueDate] = useState<DateType>(new Date())
-  const [dueDate, setDueDate] = useState<DateType>(new Date(tomorrowDate))
+  const { data: categorys } = useSelector((state: RootState) => state.category)
 
-  // ** Hook
-  const theme = useTheme()
+  const [endDate, setEndDate] = useState<DateType>(null)
+  const [language, setLanguage] = useState<string[]>([])
 
-  // ** Deletes form
-  const deleteForm = (e: SyntheticEvent) => {
-    e.preventDefault()
-
-    // @ts-ignore
-    e.target.closest('.repeater-wrapper').remove()
+  const handleCategoryChange = (event: SelectChangeEvent<string[]>) => {
+    setSelected(event.target.value as string[])
   }
 
-  // ** Handle Invoice To Change
-  const handleInvoiceChange = (event: SelectChangeEvent) => {
-    setSelected(event.target.value)
-    if (clients !== undefined) {
-      setSelectedClient(clients.filter(i => i.name === event.target.value)[0])
-    }
+  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
+    setLanguage(event.target.value as string[])
   }
 
   const handleAddNewCustomer = () => {
     toggleAddCustomerDrawer()
   }
 
+  useEffect(() => {
+    dispatch(fetchCategory())
+  }, [dispatch])
+
   return (
     <Card>
       <CardContent>
-        <Grid container>
-          <Grid item xl={6} xs={12} sx={{ mb: { xl: 0, xs: 4 } }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ mb: 6, display: 'flex', alignItems: 'center' }}>
-                <svg width={40} fill='none' height={22} viewBox='0 0 268 150' xmlns='http://www.w3.org/2000/svg'>
-                  <rect
-                    rx='25.1443'
-                    width='50.2886'
-                    height='143.953'
-                    fill={theme.palette.primary.main}
-                    transform='matrix(-0.865206 0.501417 0.498585 0.866841 195.571 0)'
-                  />
-                  <rect
-                    rx='25.1443'
-                    width='50.2886'
-                    height='143.953'
-                    fillOpacity='0.4'
-                    fill='url(#paint0_linear_7821_79167)'
-                    transform='matrix(-0.865206 0.501417 0.498585 0.866841 196.084 0)'
-                  />
-                  <rect
-                    rx='25.1443'
-                    width='50.2886'
-                    height='143.953'
-                    fill={theme.palette.primary.main}
-                    transform='matrix(0.865206 0.501417 -0.498585 0.866841 173.147 0)'
-                  />
-                  <rect
-                    rx='25.1443'
-                    width='50.2886'
-                    height='143.953'
-                    fill={theme.palette.primary.main}
-                    transform='matrix(-0.865206 0.501417 0.498585 0.866841 94.1973 0)'
-                  />
-                  <rect
-                    rx='25.1443'
-                    width='50.2886'
-                    height='143.953'
-                    fillOpacity='0.4'
-                    fill='url(#paint1_linear_7821_79167)'
-                    transform='matrix(-0.865206 0.501417 0.498585 0.866841 94.1973 0)'
-                  />
-                  <rect
-                    rx='25.1443'
-                    width='50.2886'
-                    height='143.953'
-                    fill={theme.palette.primary.main}
-                    transform='matrix(0.865206 0.501417 -0.498585 0.866841 71.7728 0)'
-                  />
-                  <defs>
-                    <linearGradient
-                      y1='0'
-                      x1='25.1443'
-                      x2='25.1443'
-                      y2='143.953'
-                      id='paint0_linear_7821_79167'
-                      gradientUnits='userSpaceOnUse'
-                    >
-                      <stop />
-                      <stop offset='1' stopOpacity='0' />
-                    </linearGradient>
-                    <linearGradient
-                      y1='0'
-                      x1='25.1443'
-                      x2='25.1443'
-                      y2='143.953'
-                      id='paint1_linear_7821_79167'
-                      gradientUnits='userSpaceOnUse'
-                    >
-                      <stop />
-                      <stop offset='1' stopOpacity='0' />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <Typography variant='h6' sx={{ ml: 2, fontWeight: 700, lineHeight: 1.2 }}>
-                  {themeConfig.templateName}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant='body2' sx={{ mb: 1 }}>
-                  Office 149, 450 South Brand Brooklyn
-                </Typography>
-                <Typography variant='body2' sx={{ mb: 1 }}>
-                  San Diego County, CA 91905, USA
-                </Typography>
-                <Typography variant='body2'>+1 (123) 456 7891, +44 (876) 543 2198</Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xl={6} xs={12}>
-            <DatePickerWrapper sx={{ '& .react-datepicker-wrapper': { width: 'auto' } }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: { xl: 'flex-end', xs: 'flex-start' } }}>
-                <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-                  <Typography variant='h6' sx={{ mr: 1, width: '105px' }}>
-                    Invoice
-                  </Typography>
-                  <TextField
-                    size='small'
-                    value={invoiceNumber}
-                    sx={{ width: { sm: '250px', xs: '170px' } }}
-                    InputProps={{
-                      disabled: true,
-                      startAdornment: <InputAdornment position='start'>#</InputAdornment>
-                    }}
-                  />
-                </Box>
-                <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-                  <Typography variant='body2' sx={{ mr: 2, width: '100px' }}>
-                    Date Issued:
-                  </Typography>
-                  <DatePicker
-                    id='issue-date'
-                    selected={issueDate}
-                    customInput={<CustomInput />}
-                    onChange={(date: Date) => setIssueDate(date)}
-                  />
-                </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography variant='body2' sx={{ mr: 2, width: '100px' }}>
-                    Date Due:
-                  </Typography>
-                  <DatePicker
-                    id='due-date'
-                    selected={dueDate}
-                    customInput={<CustomInput />}
-                    onChange={(date: Date) => setDueDate(date)}
-                  />
-                </Box>
-              </Box>
-            </DatePickerWrapper>
-          </Grid>
-        </Grid>
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <LogoIcon />
+            <Typography variant='h6'>Thêm mới sản phẩm</Typography>
+          </Box>
+        </Box>
       </CardContent>
 
-      <Divider sx={{ mt: 1, mb: 1 }} />
-
-      <CardContent sx={{ pb: 2 }}>
-        <Grid container>
-          <Grid item xs={12} sm={6} sx={{ mb: { lg: 0, xs: 4 } }}>
-            <Typography variant='subtitle2' sx={{ mb: 3, color: 'text.primary' }}>
-              Invoice To:
-            </Typography>
-            <Select size='small' value={selected} onChange={handleInvoiceChange} sx={{ mb: 4, width: '200px' }}>
-              <CustomSelectItem value=''>
-                <Button
-                  fullWidth
-                  size='small'
-                  color='success'
-                  onClick={handleAddNewCustomer}
-                  startIcon={<Plus fontSize='small' />}
-                  sx={{ '&:hover': { backgroundColor: 'transparent' } }}
-                >
-                  Add New Customer
-                </Button>
-              </CustomSelectItem>
-              {clients !== undefined &&
-                clients.map(client => (
-                  <MenuItem key={client.name} value={client.name}>
-                    {client.name}
-                  </MenuItem>
-                ))}
-            </Select>
-            {selectedClient !== null && selectedClient !== undefined ? (
-              <Box>
-                <Typography variant='body2' sx={{ mb: 1, color: 'text.primary' }}>
-                  {selectedClient.company}
-                </Typography>
-                <Typography variant='body2' sx={{ mb: 1, color: 'text.primary' }}>
-                  {selectedClient.address}
-                </Typography>
-                <Typography variant='body2' sx={{ mb: 1, color: 'text.primary' }}>
-                  {selectedClient.contact}
-                </Typography>
-                <Typography variant='body2' sx={{ mb: 1, color: 'text.primary' }}>
-                  {selectedClient.companyEmail}
-                </Typography>
-              </Box>
-            ) : null}
-          </Grid>
-          <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: ['flex-start', 'flex-end'] }}>
-            <div>
-              <Typography variant='subtitle2' sx={{ mb: 2.5, color: 'text.primary' }}>
-                Bill To:
-              </Typography>
-              <TableContainer>
-                <Table>
-                  <TableBody>
-                    <TableRow>
-                      <MUITableCell>
-                        <Typography variant='body2'>Total Due:</Typography>
-                      </MUITableCell>
-                      <MUITableCell>
-                        <Typography variant='body2'>$12,110.55</Typography>
-                      </MUITableCell>
-                    </TableRow>
-                    <TableRow>
-                      <MUITableCell>
-                        <Typography variant='body2'>Bank name:</Typography>
-                      </MUITableCell>
-                      <MUITableCell>
-                        <Typography variant='body2'>American Bank</Typography>
-                      </MUITableCell>
-                    </TableRow>
-                    <TableRow>
-                      <MUITableCell>
-                        <Typography variant='body2'>Country:</Typography>
-                      </MUITableCell>
-                      <MUITableCell>
-                        <Typography variant='body2'>United States</Typography>
-                      </MUITableCell>
-                    </TableRow>
-                    <TableRow>
-                      <MUITableCell>
-                        <Typography variant='body2'>IBAN:</Typography>
-                      </MUITableCell>
-                      <MUITableCell>
-                        <Typography variant='body2'>ETD95476213874685</Typography>
-                      </MUITableCell>
-                    </TableRow>
-                    <TableRow>
-                      <MUITableCell>
-                        <Typography variant='body2'>SWIFT code:</Typography>
-                      </MUITableCell>
-                      <MUITableCell>
-                        <Typography variant='body2'>BR91905</Typography>
-                      </MUITableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-          </Grid>
-        </Grid>
-      </CardContent>
-
-      <Divider sx={{ mb: 1.25 }} />
-
-      <RepeaterWrapper>
-        <Repeater count={count}>
-          {(i: number) => {
-            const Tag = i === 0 ? Box : Collapse
-
-            return (
-              <Tag key={i} className='repeater-wrapper' {...(i !== 0 ? { in: true } : {})}>
-                <Grid container>
-                  <RepeatingContent item xs={12}>
-                    <Grid container sx={{ py: 4, width: '100%', pr: { lg: 0, xs: 4 } }}>
-                      <Grid item lg={6} md={5} xs={12} sx={{ px: 4, my: { lg: 0, xs: 4 } }}>
-                        <Typography
-                          variant='subtitle2'
-                          className='col-title'
-                          sx={{ mb: { md: 2, xs: 0 }, color: 'text.primary' }}
-                        >
-                          Item
-                        </Typography>
-                        <Select fullWidth size='small' defaultValue='App Design'>
-                          <MenuItem value='App Design'>App Design</MenuItem>
-                          <MenuItem value='App Customization'>App Customization</MenuItem>
-                          <MenuItem value='ABC Template'>ABC Template</MenuItem>
-                          <MenuItem value='App Development'>App Development</MenuItem>
-                        </Select>
-                        <TextField
-                          rows={2}
-                          fullWidth
-                          multiline
-                          size='small'
-                          sx={{ mt: 3.5 }}
-                          defaultValue='Customization & Bug Fixes'
-                        />
-                      </Grid>
-                      <Grid item lg={2} md={3} xs={12} sx={{ px: 4, my: { lg: 0, xs: 4 } }}>
-                        <Typography
-                          variant='subtitle2'
-                          className='col-title'
-                          sx={{ mb: { md: 2, xs: 0 }, color: 'text.primary' }}
-                        >
-                          Cost
-                        </Typography>
-                        <TextField
-                          size='small'
-                          type='number'
-                          placeholder='24'
-                          defaultValue='24'
-                          InputProps={{ inputProps: { min: 0 } }}
-                        />
-                        <Box sx={{ mt: 3.5 }}>
-                          <Typography component='span' variant='body2' sx={{ lineHeight: 2 }}>
-                            Discount:
-                          </Typography>{' '}
-                          <Typography component='span' variant='body2'>
-                            0%
-                          </Typography>
-                          <Tooltip title='Tax 1' placement='top'>
-                            <Typography component='span' variant='body2' sx={{ mx: 2 }}>
-                              0%
-                            </Typography>
-                          </Tooltip>
-                          <Tooltip title='Tax 2' placement='top'>
-                            <Typography component='span' variant='body2'>
-                              0%
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      </Grid>
-                      <Grid item lg={2} md={2} xs={12} sx={{ px: 4, my: { lg: 0, xs: 4 } }}>
-                        <Typography
-                          variant='subtitle2'
-                          className='col-title'
-                          sx={{ mb: { md: 2, xs: 0 }, color: 'text.primary' }}
-                        >
-                          Hours
-                        </Typography>
-                        <TextField
-                          size='small'
-                          type='number'
-                          placeholder='1'
-                          defaultValue='1'
-                          InputProps={{ inputProps: { min: 0 } }}
-                        />
-                      </Grid>
-                      <Grid item lg={2} md={1} xs={12} sx={{ px: 4, my: { lg: 0 }, mt: 2 }}>
-                        <Typography
-                          variant='subtitle2'
-                          className='col-title'
-                          sx={{ mb: { md: 2, xs: 0 }, color: 'text.primary' }}
-                        >
-                          Price
-                        </Typography>
-                        <Typography variant='body2'>$24.00</Typography>
-                      </Grid>
-                    </Grid>
-                    <InvoiceAction>
-                      <IconButton size='small' onClick={deleteForm}>
-                        <Close fontSize='small' />
-                      </IconButton>
-                    </InvoiceAction>
-                  </RepeatingContent>
-                </Grid>
-              </Tag>
-            )
-          }}
-        </Repeater>
-
-        <Grid container sx={{ mt: 4.75 }}>
-          <Grid item xs={12} sx={{ px: 0 }}>
-            <Button
-              size='small'
-              variant='contained'
-              startIcon={<Plus fontSize='small' />}
-              onClick={() => setCount(count + 1)}
-            >
-              Add Item
-            </Button>
-          </Grid>
-        </Grid>
-      </RepeaterWrapper>
-
-      <Divider />
-
-      <CardContent>
-        <Grid container>
-          <Grid item xs={12} sm={9} sx={{ order: { sm: 1, xs: 2 } }}>
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-              <Typography
-                variant='body2'
-                sx={{ mr: 2, color: 'text.primary', fontWeight: 600, letterSpacing: '.25px' }}
-              >
-                Salesperson:
-              </Typography>
+      <form>
+        <CardContent>
+          <Grid container spacing={5}>
+            <Grid item xs={12}>
+              <Divider sx={{ mb: 0 }} />
+            </Grid>
+            <Grid item xs={12}>
               <TextField
+                required
                 size='small'
-                defaultValue='Tommy Shelby'
-                sx={{ maxWidth: '150px', '& .MuiInputBase-input': { color: 'text.secondary' } }}
+                fullWidth
+                label='Tên sản phẩm'
+                placeholder='Nấm đùi gà Green Kingdom 250gr'
               />
-            </Box>
-            <TextField
-              size='small'
-              placeholder='Thanks for your business'
-              sx={{ maxWidth: '300px', '& .MuiInputBase-input': { color: 'text.secondary' } }}
-            />
-          </Grid>
-          <Grid item xs={12} sm={3} sx={{ mb: { sm: 0, xs: 4 }, order: { sm: 2, xs: 1 } }}>
-            <CalcWrapper>
-              <Typography variant='body2'>Subtotal:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary', lineHeight: '.25px' }}>
-                $1800
-              </Typography>
-            </CalcWrapper>
-            <CalcWrapper>
-              <Typography variant='body2'>Discount:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary', lineHeight: '.25px' }}>
-                $28
-              </Typography>
-            </CalcWrapper>
-            <CalcWrapper>
-              <Typography variant='body2'>Tax:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary', lineHeight: '.25px' }}>
-                21%
-              </Typography>
-            </CalcWrapper>
-            <Divider sx={{ mt: 6, mb: 1.5 }} />
-            <CalcWrapper>
-              <Typography variant='body2'>Total:</Typography>
-              <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary', lineHeight: '.25px' }}>
-                $1690
-              </Typography>
-            </CalcWrapper>
-          </Grid>
-        </Grid>
-      </CardContent>
+            </Grid>
+            <Grid item xs={12} sm={6} lg={4}>
+              <TextField required size='small' fullWidth label='Giá sản phẩm' placeholder='150.000đ' />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={4}>
+              <TextField size='small' fullWidth label='Giá khuyến mãi' placeholder='175.000đ' />
+            </Grid>
+            <Grid item xs={12} sm={6} lg={4}>
+              <TextField required size='small' fullWidth label='Số lượng' placeholder='100' />
+            </Grid>
 
-      <Divider sx={{ my: 1 }} />
-
-      <CardContent sx={{ pt: 4 }}>
-        <InputLabel htmlFor='invoice-note'>Note:</InputLabel>
-        <TextField
-          rows={2}
-          fullWidth
-          multiline
-          id='invoice-note'
-          sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
-          defaultValue='It was a pleasure working with you and your team. We hope you will keep us in mind for future freelance projects. Thank You!'
-        />
-      </CardContent>
+            <Grid item xs={12}>
+              <FormControl fullWidth size='small'>
+                <InputLabel id='select-category'>Danh mục</InputLabel>
+                <Select
+                  multiple
+                  value={selected}
+                  onChange={handleCategoryChange}
+                  id='form-layouts-separator-multiple-select'
+                  input={<OutlinedInput label='Danh mục' id='select-category' />}
+                >
+                  <CustomSelectItem>
+                    <Button
+                      fullWidth
+                      color='primary'
+                      onClick={handleAddNewCustomer}
+                      startIcon={<Plus fontSize='small' />}
+                      sx={{ '&:hover': { backgroundColor: 'transparent' } }}
+                    >
+                      Thêm danh mục mới
+                    </Button>
+                  </CustomSelectItem>
+                  {categorys !== undefined &&
+                    categorys.map((category: CategoryType) => (
+                      <MenuItem key={category._id} value={category.title}>
+                        {category.title}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth size='small'>
+                <InputLabel id='form-layouts-separator-multiple-select-label'>Thương hiệu</InputLabel>
+                <Select
+                  multiple
+                  value={language}
+                  onChange={handleSelectChange}
+                  id='form-layouts-separator-multiple-select'
+                  labelId='form-layouts-separator-multiple-select-label'
+                  input={<OutlinedInput label='Thương hiệu' id='select-multiple-language' />}
+                >
+                  <MenuItem value='English'>English</MenuItem>
+                  <MenuItem value='French'>French</MenuItem>
+                  <MenuItem value='Spanish'>Spanish</MenuItem>
+                  <MenuItem value='Portuguese'>Portuguese</MenuItem>
+                  <MenuItem value='Italian'>Italian</MenuItem>
+                  <MenuItem value='German'>German</MenuItem>
+                  <MenuItem value='Arabic'>Arabic</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <DatePickerWrapper>
+                <DatePicker
+                  selected={date}
+                  showYearDropdown
+                  showMonthDropdown
+                  maxDate={new Date()}
+                  placeholderText='MM-DD-YYYY'
+                  customInput={<CustomInput label='Ngày nhập hàng' />}
+                  id='form-layouts-separator-date'
+                  onChange={(date: Date) => setDate(date)}
+                />
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <DatePickerWrapper>
+                <DatePicker
+                  selected={endDate}
+                  minDate={new Date()}
+                  showYearDropdown
+                  showMonthDropdown
+                  placeholderText='MM-DD-YYYY'
+                  customInput={<CustomInput label='Ngày hết hạn' />}
+                  id='form-layouts-separator-date'
+                  onChange={(date: Date) => setEndDate(date)}
+                />
+              </DatePickerWrapper>
+            </Grid>
+            <Grid item xs={12}>
+              <InputLabel htmlFor='invoice-note'>Mô tả:</InputLabel>
+              <TextField
+                rows={4}
+                fullWidth
+                multiline
+                id='invoice-note'
+                sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FileUploaderRestrictions title={'Tải lên hình ảnh của sản phẩm'} />
+            </Grid>
+          </Grid>
+        </CardContent>
+      </form>
     </Card>
   )
 }
 
-export default EditCard
+export default AddCard

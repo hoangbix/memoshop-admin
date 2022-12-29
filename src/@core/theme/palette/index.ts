@@ -35,20 +35,8 @@ const DefaultPalette = (mode: PaletteMode, skin: Skin) => {
     },
     mode: mode,
     primary: {
-      light: '#787EFF',
-      main: '#666CFF',
-      dark: '#5A5FE0',
-      contrastText: '#FFF'
-    },
-    secondary: {
-      light: '#7F889B',
-      main: '#6D788D',
-      dark: '#606A7C',
-      contrastText: '#FFF'
-    },
-    success: {
-      light: '#83E542',
-      main: '#72E128',
+      light: '#3bb77e',
+      main: '#3bb77e',
       dark: '#64C623',
       contrastText: '#FFF'
     },
@@ -58,6 +46,19 @@ const DefaultPalette = (mode: PaletteMode, skin: Skin) => {
       dark: '#E04440',
       contrastText: '#FFF'
     },
+    secondary: {
+      light: '#7F889B',
+      main: '#6D788D',
+      dark: '#606A7C',
+      contrastText: '#FFF'
+    },
+    success: {
+      light: '#787EFF',
+      main: '#666CFF',
+      dark: '#5A5FE0',
+      contrastText: '#FFF'
+    },
+
     warning: {
       light: '#FDBE42',
       main: '#FDB528',

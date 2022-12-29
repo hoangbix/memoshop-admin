@@ -1,24 +1,19 @@
-// ** React Imports
 import { createContext, useEffect, useState, ReactNode } from 'react'
 
-// ** Next Import
 import { useRouter } from 'next/router'
 
-// ** Axios
 import axios from 'axios'
 
 import jwt from 'jsonwebtoken'
 
-// ** Config
 import authConfig from 'src/configs/auth'
 
-// ** Types
 import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType } from './types'
 
-// ** Defaults
 const defaultProvider: AuthValuesType = {
   user: null,
   loading: true,
+  isLoadingBtn: false,
   setUser: () => null,
   setLoading: () => Boolean,
   isInitialized: false,
@@ -35,12 +30,11 @@ type Props = {
 }
 
 const AuthProvider = ({ children }: Props) => {
-  // ** States
-  const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
+  const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
+  const [isLoadingBtn, setLoadingBtn] = useState<boolean>(defaultProvider.isLoadingBtn)
   const [isInitialized, setIsInitialized] = useState<boolean>(defaultProvider.isInitialized)
 
-  // ** Hooks
   const router = useRouter()
 
   useEffect(() => {
@@ -80,6 +74,8 @@ const AuthProvider = ({ children }: Props) => {
   }, [])
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
+    setLoadingBtn(true)
+
     axios
       .post(authConfig.loginEndpoint, params)
       .then(async res => {
@@ -108,11 +104,17 @@ const AuthProvider = ({ children }: Props) => {
               const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
 
               router.replace(redirectURL as string)
+              setLoadingBtn(false)
+            })
+            .catch(err => {
+              if (errorCallback) errorCallback(err)
+              setLoadingBtn(false)
             })
         }
       })
       .catch(err => {
         if (errorCallback) errorCallback(err)
+        setLoadingBtn(false)
       })
   }
 
@@ -142,6 +144,7 @@ const AuthProvider = ({ children }: Props) => {
     loading,
     setUser,
     setLoading,
+    isLoadingBtn,
     isInitialized,
     setIsInitialized,
     login: handleLogin,

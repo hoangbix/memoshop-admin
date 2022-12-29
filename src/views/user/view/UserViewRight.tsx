@@ -24,7 +24,7 @@ import UserViewConnection from 'src/views/user/view/UserViewConnection'
 import UserViewNotification from 'src/views/user/view/UserViewNotification'
 
 // ** Types
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
+import { InvoiceType } from 'src/types/apps/productTypes'
 
 interface Props {
   invoiceData: InvoiceType[]

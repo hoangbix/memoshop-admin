@@ -12,7 +12,7 @@ import Alert from '@mui/material/Alert'
 import axios from 'axios'
 
 // ** Types
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
+import { InvoiceType } from 'src/types/apps/productTypes'
 import { UserLayoutType, UsersType } from 'src/types/apps/userTypes'
 
 // ** Demo Components Imports

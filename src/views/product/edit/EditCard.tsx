@@ -37,7 +37,7 @@ import themeConfig from 'src/configs/themeConfig'
 
 // ** Types
 import { DateType } from 'src/types/forms/reactDatepickerTypes'
-import { SingleInvoiceType, InvoiceClientType } from 'src/types/apps/invoiceTypes'
+import { SingleInvoiceType, InvoiceClientType } from 'src/types/apps/productTypes'
 
 // ** Custom Component Imports
 import Repeater from 'src/@core/components/repeater'

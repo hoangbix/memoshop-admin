@@ -191,11 +191,20 @@ const Customizer = () => {
                   onClick={() => handleChange('themeColor', 'primary')}
                   sx={{
                     ml: 0,
-                    backgroundColor: '#666CFF',
+                    backgroundColor: '#3bb77e',
                     ...(themeColor === 'primary' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
                   }}
                 >
                   {themeColor === 'primary' ? <Check fontSize='small' /> : null}
+                </ColorBox>
+                <ColorBox
+                  onClick={() => handleChange('themeColor', 'error')}
+                  sx={{
+                    backgroundColor: 'error.main',
+                    ...(themeColor === 'error' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
+                  }}
+                >
+                  {themeColor === 'error' ? <Check fontSize='small' /> : null}
                 </ColorBox>
                 <ColorBox
                   onClick={() => handleChange('themeColor', 'secondary')}
@@ -215,15 +224,7 @@ const Customizer = () => {
                 >
                   {themeColor === 'success' ? <Check fontSize='small' /> : null}
                 </ColorBox>
-                <ColorBox
-                  onClick={() => handleChange('themeColor', 'error')}
-                  sx={{
-                    backgroundColor: 'error.main',
-                    ...(themeColor === 'error' ? { boxShadow: 9 } : { '&:hover': { boxShadow: 4 } })
-                  }}
-                >
-                  {themeColor === 'error' ? <Check fontSize='small' /> : null}
-                </ColorBox>
+
                 <ColorBox
                   onClick={() => handleChange('themeColor', 'warning')}
                   sx={{

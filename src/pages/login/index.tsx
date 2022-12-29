@@ -18,6 +18,7 @@ import FormHelperText from '@mui/material/FormHelperText'
 import InputAdornment from '@mui/material/InputAdornment'
 import Typography, { TypographyProps } from '@mui/material/Typography'
 import MuiFormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel'
+import LoadingButton from '@mui/lab/LoadingButton'
 
 import Google from 'mdi-material-ui/Google'
 import Github from 'mdi-material-ui/Github'
@@ -130,7 +131,9 @@ const LoginPage = () => {
     auth.login({ email, password }, (err: any) => {
       setError('email', {
         type: 'manual',
-        message: err?.response?.data?.message
+        message:
+          err?.response?.data?.message ||
+          'Lỗi không xác định. Vui lòng đăng nhập sau vài phút hoặc liên hệ với bộ phận IT'
       })
     })
   }
@@ -249,9 +252,24 @@ const LoginPage = () => {
                   </Typography>
                 </Link>
               </Box>
-              <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
-                Đăng nhập
-              </Button>
+
+              {!auth.isLoadingBtn ? (
+                <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
+                  Đăng nhập
+                </Button>
+              ) : (
+                <LoadingButton
+                  fullWidth
+                  size='large'
+                  type='submit'
+                  variant='contained'
+                  loading={true}
+                  sx={{ mb: 7 }}
+                  disabled
+                >
+                  Đăng nhập
+                </LoadingButton>
+              )}
 
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Typography sx={{ mr: 2, color: 'text.secondary' }}>Bạn là quản trị viên mới?</Typography>

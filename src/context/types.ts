@@ -27,6 +27,7 @@ export type AuthValuesType = {
   logout: () => void
   isInitialized: boolean
   user: UserDataType | null
+  isLoadingBtn: boolean
   setUser: (value: UserDataType | null) => void
   setIsInitialized: (value: boolean) => void
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void

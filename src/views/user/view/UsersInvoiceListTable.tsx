@@ -35,7 +35,7 @@ import InformationOutline from 'mdi-material-ui/InformationOutline'
 
 // ** Type Imports
 import { ThemeColor } from 'src/@core/layouts/types'
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
+import { InvoiceType } from 'src/types/apps/productTypes'
 
 // ** Custom Component Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'

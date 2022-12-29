@@ -27,7 +27,7 @@ import MuiTimeline, { TimelineProps } from '@mui/lab/Timeline'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
-import { InvoiceType } from 'src/types/apps/invoiceTypes'
+import { InvoiceType } from 'src/types/apps/productTypes'
 
 // ** Demo Component Imports
 import UsersInvoiceListTable from './UsersInvoiceListTable'
