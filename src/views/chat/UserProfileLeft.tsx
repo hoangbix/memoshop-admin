@@ -1,7 +1,5 @@
-// ** React Imports
 import { ChangeEvent, Fragment, ReactNode } from 'react'
 
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import List from '@mui/material/List'
 import Badge from '@mui/material/Badge'
@@ -18,20 +16,16 @@ import ListItemText from '@mui/material/ListItemText'
 import ListItemButton from '@mui/material/ListItemButton'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
-// ** Icons Imports
 import Close from 'mdi-material-ui/Close'
 import BellOutline from 'mdi-material-ui/BellOutline'
 import DeleteOutline from 'mdi-material-ui/DeleteOutline'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import CheckCircleOutline from 'mdi-material-ui/CheckCircleOutline'
 
-// ** Third Party Components
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
-// ** Types
 import { StatusType, UserProfileLeftType } from 'src/types/apps/chatTypes'
 
-// ** Custom Component Imports
 import Sidebar from 'src/@core/components/sidebar'
 
 const UserProfileLeft = (props: UserProfileLeftType) => {

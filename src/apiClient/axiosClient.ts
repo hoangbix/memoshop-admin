@@ -1,17 +1,17 @@
 import axios from 'axios'
-// import authConfig from 'src/configs/auth'
+import authConfig from 'src/configs/auth'
 
-// const getLocalStorageItem = (key: string) => {
-//   return typeof window !== undefined ? window.localStorage.getItem(key) : null
-// }
-
-// const token = getLocalStorageItem(authConfig.storageTokenKeyName)
+const getLocalStorage = (key: string) => {
+  if (typeof window !== 'undefined') {
+    return window.localStorage.getItem(key)
+  }
+}
 
 const axiosClient = axios.create({
   baseURL: '/api/v1',
   headers: {
-    'Content-Type': 'application/json'
-    // Authorization: `Bearer ${token}`
+    'Content-Type': 'application/json',
+    Authorization: 'Bearer ' + getLocalStorage(authConfig.storageTokenKeyName)
   }
 })
 

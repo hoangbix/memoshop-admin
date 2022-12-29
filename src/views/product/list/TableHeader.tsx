@@ -32,7 +32,7 @@ const TableHeader = (props: TableHeaderProps) => {
         onChange={e => handleFilter(e.target.value)}
       />
       <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-        <Link href='/apps/invoice/add' passHref>
+        <Link href='/product/add' passHref>
           <Button sx={{ mb: 2 }} variant='contained'>
             Tạo mới sản phẩm
           </Button>

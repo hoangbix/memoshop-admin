@@ -13,11 +13,11 @@ import { useForm, Controller } from 'react-hook-form'
 
 import Close from 'mdi-material-ui/Close'
 import { AppDispatch } from 'src/store'
-import { addCategory } from 'src/store/apps/category'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import FileUploaderRestrictions from 'src/@core/components/upload-file/FileUploaderRestrictions'
 import { useState } from 'react'
+import { addBrand } from 'src/store/apps/brand'
 
 interface Props {
   open: boolean
@@ -39,10 +39,10 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const schema = yup.object().shape({
   title: yup.string().required('Đây là trường bắt buộc').min(3, 'Tối thiểu 3 ký tự'),
-  desc: yup.string().required('Đây là trường bắt buộc').min(10, 'Tối thiểu 3 ký tự').max(5000, 'Tối đa 5000 ký tự')
+  desc: yup.string().required('Đây là trường bắt buộc').min(10, 'Tối thiểu 10 ký tự').max(5000, 'Tối đa 5000 ký tự')
 })
 
-const AddNewCategory = ({ open, toggle }: Props) => {
+const AddNewBrand = ({ open, toggle }: Props) => {
   const dispatch = useDispatch<AppDispatch>()
   const [files, setFiles] = useState<File[]>([])
 
@@ -57,13 +57,13 @@ const AddNewCategory = ({ open, toggle }: Props) => {
   })
 
   const onSubmit = async (data: FormData) => {
-    await dispatch(addCategory(data))
+    await dispatch(addBrand(data))
       .unwrap()
       .then(() => {
-        toast.success('Thêm danh mục thành công.', {
+        toast.success('Thêm thương hiệu thành công.', {
           duration: 4000
         })
-        toggle()
+        handleDrawerClose()
       })
       .catch(err => {
         setError('title', {
@@ -89,7 +89,7 @@ const AddNewCategory = ({ open, toggle }: Props) => {
       sx={{ '& .MuiDrawer-paper': { width: [300, 400] }, zIndex: 999999 }}
     >
       <Header>
-        <Typography variant='h6'>Thêm danh mục mới</Typography>
+        <Typography variant='h6'>Thêm thương hiệu mới</Typography>
         <Close fontSize='small' onClick={toggle} sx={{ cursor: 'pointer' }} />
       </Header>
       <Box component='form' sx={{ p: 5 }} onSubmit={handleSubmit(onSubmit)}>
@@ -101,7 +101,7 @@ const AddNewCategory = ({ open, toggle }: Props) => {
             render={({ field: { value, onChange } }) => (
               <TextField
                 size='small'
-                label='Tên danh mục'
+                label='Tên thương hiệu'
                 value={value}
                 variant='outlined'
                 onChange={onChange}
@@ -119,7 +119,7 @@ const AddNewCategory = ({ open, toggle }: Props) => {
             render={({ field: { value, onChange } }) => (
               <TextField
                 size='small'
-                label='Mô tả danh mục'
+                label='Mô tả thương hiệu'
                 value={value}
                 rows={3}
                 fullWidth
@@ -134,7 +134,7 @@ const AddNewCategory = ({ open, toggle }: Props) => {
           {errors.desc && <FormHelperText sx={{ color: 'error.main' }}>{errors.desc.message}</FormHelperText>}
         </FormControl>
         <FileUploaderRestrictions
-          title={'Tải lên hình đại diện của danh mục'}
+          title={'Tải lên hình đại diện của thương hiệu'}
           isSmall
           setFiles={setFiles}
           files={files}
@@ -152,4 +152,4 @@ const AddNewCategory = ({ open, toggle }: Props) => {
   )
 }
 
-export default AddNewCategory
+export default AddNewBrand

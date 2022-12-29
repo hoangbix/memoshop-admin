@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import chat from 'src/store/apps/chat'
 import user from 'src/store/apps/user'
 import email from 'src/store/apps/email'
+import brand from 'src/store/apps/brand'
 import product from 'src/store/apps/product'
 import category from 'src/store/apps/category'
 import invoice from 'src/store/apps/invoice'
@@ -14,6 +15,7 @@ export const store = configureStore({
     user,
     chat,
     email,
+    brand,
     invoice,
     product,
     category,

@@ -1,23 +1,15 @@
-// ** React Import
 import { ReactNode } from 'react'
 
-// ** Next Import
 import Link from 'next/link'
 
-// ** MUI Imports
 import IconButton from '@mui/material/IconButton'
 import Box, { BoxProps } from '@mui/material/Box'
 import { styled, useTheme } from '@mui/material/styles'
-import Typography, { TypographyProps } from '@mui/material/Typography'
 
-// ** Icons
 import Close from 'mdi-material-ui/Close'
 
-// ** Type Import
 import { Settings } from 'src/@core/context/settingsContext'
 
-// ** Configs
-import themeConfig from 'src/configs/themeConfig'
 import LogoIcon from '../../shared-components/logo'
 
 interface Props {
@@ -33,7 +25,6 @@ interface Props {
   verticalNavMenuBranding?: (props?: any) => ReactNode
 }
 
-// ** Styled Components
 const MenuHeaderWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -42,12 +33,6 @@ const MenuHeaderWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   transition: 'padding .25s ease-in-out',
   minHeight: theme.mixins.toolbar.minHeight
 }))
-
-const HeaderTitle = styled(Typography)<TypographyProps>({
-  fontWeight: 700,
-  lineHeight: 1.2,
-  transition: 'opacity .25s ease-in-out, margin .25s ease-in-out'
-})
 
 const StyledLink = styled('a')({
   display: 'flex',
@@ -70,10 +55,8 @@ const VerticalNavHeader = (props: Props) => {
     verticalNavMenuBranding: userVerticalNavMenuBranding
   } = props
 
-  // ** Hooks & Vars
   const theme = useTheme()
   const { skin, direction, navCollapsed } = settings
-  const menuCollapsedStyles = navCollapsed && !navHover ? { opacity: 0 } : { opacity: 1 }
 
   const svgFillSecondary = () => {
     if (skin === 'semi-dark' && theme.palette.mode === 'light') {
@@ -138,9 +121,6 @@ const VerticalNavHeader = (props: Props) => {
         <Link href='/' passHref>
           <StyledLink>
             <LogoIcon width={120} />
-            {/* <HeaderTitle variant='h6' sx={{ ...menuCollapsedStyles, ...(navCollapsed && !navHover ? {} : { ml: 2 }) }}>
-              {themeConfig.templateName}
-            </HeaderTitle> */}
           </StyledLink>
         </Link>
       )}

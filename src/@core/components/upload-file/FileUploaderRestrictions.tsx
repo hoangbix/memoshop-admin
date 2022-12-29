@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 
 import Box from '@mui/material/Box'
 import ListItem from '@mui/material/ListItem'
@@ -27,8 +27,15 @@ const HeadingTypography = styled(Typography)<TypographyProps>(({ theme }) => ({
   }
 }))
 
-const FileUploaderRestrictions = ({ title }: { title: string }) => {
-  const [files, setFiles] = useState<File[]>([])
+interface Props {
+  title: string
+  isSmall?: boolean
+  files: File[]
+  setFiles: (files: File[]) => void
+}
+
+const FileUploaderRestrictions = (props: Props) => {
+  const { files = [], setFiles, title, isSmall } = props
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 5,
@@ -36,7 +43,7 @@ const FileUploaderRestrictions = ({ title }: { title: string }) => {
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg']
     },
-    multiple: true,
+    multiple: isSmall ? false : true,
     onDrop: (acceptedFiles: File[]) => {
       setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
     },
@@ -63,7 +70,7 @@ const FileUploaderRestrictions = ({ title }: { title: string }) => {
 
   return (
     <DropzoneWrapper>
-      <HeadingTypography variant='h5' sx={{ mb: '5px', mt: '20px' }}>
+      <HeadingTypography variant={isSmall ? 'h6' : 'h5'} sx={{ mb: '5px', mt: '20px' }}>
         {title}
       </HeadingTypography>
       <div {...getRootProps({ className: 'dropzone' })}>
@@ -76,9 +83,11 @@ const FileUploaderRestrictions = ({ title }: { title: string }) => {
             cursor: 'pointer'
           }}
         >
-          <HeadingTypography variant='h5'>Kéo thả tập tin hoặc bấm vào đây</HeadingTypography>
+          <HeadingTypography variant={isSmall ? 'h6' : 'h5'}>Kéo thả tập tin hoặc bấm vào đây</HeadingTypography>
           <Typography color='textSecondary'>Cho phép *.jpeg, *.jpg, *.png</Typography>
-          <Typography color='textSecondary'>Tối đa 5 hình ảnh và kích thước không quá 10MB</Typography>
+          <Typography color='textSecondary'>
+            Tối đa {isSmall ? '1' : '5'} hình ảnh và kích thước không quá 10MB
+          </Typography>
         </Box>
       </div>
       {files.length ? (

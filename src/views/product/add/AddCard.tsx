@@ -1,45 +1,50 @@
 import { useState, forwardRef, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
+import DatePicker from 'react-datepicker'
+import { Controller } from 'react-hook-form'
+
+import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import Grid from '@mui/material/Grid'
+import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
 import InputLabel from '@mui/material/InputLabel'
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import { styled, alpha } from '@mui/material/styles'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-import MenuItem, { MenuItemProps } from '@mui/material/MenuItem'
+import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
+import { styled, alpha } from '@mui/material/styles'
 import OutlinedInput from '@mui/material/OutlinedInput'
-import DatePicker from 'react-datepicker'
+import { FormControl, FormHelperText } from '@mui/material'
+import MenuItem, { MenuItemProps } from '@mui/material/MenuItem'
 
 import Plus from 'mdi-material-ui/Plus'
 
-import LogoIcon from 'src/@core/layouts/components/shared-components/logo'
-import { FormControl } from '@mui/material'
-import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
-import FileUploaderRestrictions from 'src/@core/components/upload-file/FileUploaderRestrictions'
 import { fetchCategory } from 'src/store/apps/category'
-import { useDispatch } from 'react-redux'
-import { useSelector } from 'react-redux'
+import DatePickerWrapper from 'src/@core/styles/libs/react-datepicker'
+import LogoIcon from 'src/@core/layouts/components/shared-components/logo'
+import FileUploaderRestrictions from 'src/@core/components/upload-file/FileUploaderRestrictions'
+
+import { fetchBrand } from 'src/store/apps/brand'
 import { AppDispatch, RootState } from 'src/store'
+import EditorCustom from 'src/@core/components/editor-custom'
 
 interface Props {
-  toggleAddCustomerDrawer: () => void
+  toggleAddCategory: () => void
+  toggleAddBrand: () => void
+  errors: any
+  control: any
 }
 
-type DateType = Date | null | undefined
-
-interface CategoryType {
+interface CategoryBrandType {
   _id: string
   title: string
   slug: string
 }
 
 const CustomInput = forwardRef((props: any, ref) => {
-  return <TextField fullWidth {...props} inputRef={ref} autoComplete='off' size='small' />
+  return <TextField required fullWidth {...props} inputRef={ref} autoComplete='off' size='small' />
 })
 
 const CustomSelectItem = styled(MenuItem)<MenuItemProps>(({ theme }) => ({
@@ -49,40 +54,36 @@ const CustomSelectItem = styled(MenuItem)<MenuItemProps>(({ theme }) => ({
 }))
 
 const AddCard = (props: Props) => {
-  const { toggleAddCustomerDrawer } = props
+  const { toggleAddCategory, toggleAddBrand, control, errors } = props
   const dispatch = useDispatch<AppDispatch>()
 
-  const [selected, setSelected] = useState<string[]>([])
-  const [date, setDate] = useState<DateType>(null)
+  const [files, setFiles] = useState<File[]>([])
 
   const { data: categorys } = useSelector((state: RootState) => state.category)
-
-  const [endDate, setEndDate] = useState<DateType>(null)
-  const [language, setLanguage] = useState<string[]>([])
-
-  const handleCategoryChange = (event: SelectChangeEvent<string[]>) => {
-    setSelected(event.target.value as string[])
-  }
-
-  const handleSelectChange = (event: SelectChangeEvent<string[]>) => {
-    setLanguage(event.target.value as string[])
-  }
-
-  const handleAddNewCustomer = () => {
-    toggleAddCustomerDrawer()
-  }
+  const { data: brands } = useSelector((state: RootState) => state.brand)
 
   useEffect(() => {
     dispatch(fetchCategory())
+    dispatch(fetchBrand())
   }, [dispatch])
 
   return (
     <Card>
       <CardContent>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ mb: 6, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box
+            sx={{
+              mb: 6,
+              display: 'flex',
+              justifyContent: { xs: 'center', lg: 'space-between' },
+              alignItems: 'center',
+              flexDirection: { xs: 'column', lg: 'row' }
+            }}
+          >
             <LogoIcon />
-            <Typography variant='h6'>Thêm mới sản phẩm</Typography>
+            <Typography variant='h6' sx={{ mt: '20px' }}>
+              Thêm mới sản phẩm
+            </Typography>
           </Box>
         </Box>
       </CardContent>
@@ -94,115 +95,221 @@ const AddCard = (props: Props) => {
               <Divider sx={{ mb: 0 }} />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                required
-                size='small'
-                fullWidth
-                label='Tên sản phẩm'
-                placeholder='Nấm đùi gà Green Kingdom 250gr'
+              <Controller
+                name={'title'}
+                control={control}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <TextField
+                      required
+                      size='small'
+                      value={value}
+                      onChange={onChange}
+                      fullWidth
+                      label='Tên sản phẩm'
+                      placeholder='Nấm đùi gà Green Kingdom 250gr'
+                    />
+                  )
+                }}
               />
+              <FormHelperText error={true}>{errors.title?.message}</FormHelperText>
             </Grid>
             <Grid item xs={12} sm={6} lg={4}>
-              <TextField required size='small' fullWidth label='Giá sản phẩm' placeholder='150.000đ' />
+              <Controller
+                name={'price'}
+                control={control}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <TextField
+                      value={value}
+                      onChange={onChange}
+                      required
+                      size='small'
+                      fullWidth
+                      label='Giá sản phẩm'
+                      placeholder='150.000đ'
+                    />
+                  )
+                }}
+              />
+              <FormHelperText error={true}>{errors.price?.message}</FormHelperText>
             </Grid>
             <Grid item xs={12} sm={6} lg={4}>
-              <TextField size='small' fullWidth label='Giá khuyến mãi' placeholder='175.000đ' />
+              <Controller
+                name={'promotionalPrice'}
+                control={control}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <TextField
+                      value={value}
+                      onChange={onChange}
+                      size='small'
+                      fullWidth
+                      label='Giá khuyến mãi'
+                      placeholder='175.000đ'
+                    />
+                  )
+                }}
+              />
+              <FormHelperText error={true}>{errors.promotionalPrice?.message}</FormHelperText>
             </Grid>
             <Grid item xs={12} sm={6} lg={4}>
-              <TextField required size='small' fullWidth label='Số lượng' placeholder='100' />
+              <Controller
+                name={'quantity'}
+                control={control}
+                render={({ field: { value, onChange } }) => {
+                  return (
+                    <TextField
+                      value={value}
+                      onChange={onChange}
+                      size='small'
+                      fullWidth
+                      label='Số lượng'
+                      placeholder='100'
+                    />
+                  )
+                }}
+              />
+              <FormHelperText error={true}>{errors.quantity?.message}</FormHelperText>
             </Grid>
 
-            <Grid item xs={12}>
-              <FormControl fullWidth size='small'>
-                <InputLabel id='select-category'>Danh mục</InputLabel>
-                <Select
-                  multiple
-                  value={selected}
-                  onChange={handleCategoryChange}
-                  id='form-layouts-separator-multiple-select'
-                  input={<OutlinedInput label='Danh mục' id='select-category' />}
-                >
-                  <CustomSelectItem>
-                    <Button
-                      fullWidth
-                      color='primary'
-                      onClick={handleAddNewCustomer}
-                      startIcon={<Plus fontSize='small' />}
-                      sx={{ '&:hover': { backgroundColor: 'transparent' } }}
+            <Grid item xs={12} lg={6}>
+              <Controller
+                name='category'
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormControl fullWidth size='small'>
+                    <InputLabel id='category' required>
+                      Danh mục
+                    </InputLabel>
+                    <Select
+                      value={value || ''}
+                      onChange={onChange}
+                      id='category'
+                      input={<OutlinedInput label='Danh mục' id='category' fullWidth size='small' />}
                     >
-                      Thêm danh mục mới
-                    </Button>
-                  </CustomSelectItem>
-                  {categorys !== undefined &&
-                    categorys.map((category: CategoryType) => (
-                      <MenuItem key={category._id} value={category.title}>
-                        {category.title}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth size='small'>
-                <InputLabel id='form-layouts-separator-multiple-select-label'>Thương hiệu</InputLabel>
-                <Select
-                  multiple
-                  value={language}
-                  onChange={handleSelectChange}
-                  id='form-layouts-separator-multiple-select'
-                  labelId='form-layouts-separator-multiple-select-label'
-                  input={<OutlinedInput label='Thương hiệu' id='select-multiple-language' />}
-                >
-                  <MenuItem value='English'>English</MenuItem>
-                  <MenuItem value='French'>French</MenuItem>
-                  <MenuItem value='Spanish'>Spanish</MenuItem>
-                  <MenuItem value='Portuguese'>Portuguese</MenuItem>
-                  <MenuItem value='Italian'>Italian</MenuItem>
-                  <MenuItem value='German'>German</MenuItem>
-                  <MenuItem value='Arabic'>Arabic</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <DatePickerWrapper>
-                <DatePicker
-                  selected={date}
-                  showYearDropdown
-                  showMonthDropdown
-                  maxDate={new Date()}
-                  placeholderText='MM-DD-YYYY'
-                  customInput={<CustomInput label='Ngày nhập hàng' />}
-                  id='form-layouts-separator-date'
-                  onChange={(date: Date) => setDate(date)}
-                />
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <DatePickerWrapper>
-                <DatePicker
-                  selected={endDate}
-                  minDate={new Date()}
-                  showYearDropdown
-                  showMonthDropdown
-                  placeholderText='MM-DD-YYYY'
-                  customInput={<CustomInput label='Ngày hết hạn' />}
-                  id='form-layouts-separator-date'
-                  onChange={(date: Date) => setEndDate(date)}
-                />
-              </DatePickerWrapper>
-            </Grid>
-            <Grid item xs={12}>
-              <InputLabel htmlFor='invoice-note'>Mô tả:</InputLabel>
-              <TextField
-                rows={4}
-                fullWidth
-                multiline
-                id='invoice-note'
-                sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
+                      <CustomSelectItem>
+                        <Button
+                          fullWidth
+                          color='primary'
+                          onClick={toggleAddCategory}
+                          startIcon={<Plus fontSize='small' />}
+                          sx={{ '&:hover': { backgroundColor: 'transparent' } }}
+                        >
+                          Thêm danh mục mới
+                        </Button>
+                      </CustomSelectItem>
+                      {categorys !== undefined &&
+                        categorys.map((category: CategoryBrandType) => (
+                          <MenuItem key={category._id} value={category._id}>
+                            {category.title}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                )}
               />
+
+              <FormHelperText error={true}>{errors.category?.message}</FormHelperText>
+            </Grid>
+            <Grid item xs={12} lg={6}>
+              <Controller
+                name='brand'
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <FormControl fullWidth size='small'>
+                    <InputLabel id='brand' required>
+                      Thương hiệụ
+                    </InputLabel>
+                    <Select
+                      value={value || ''}
+                      onChange={onChange}
+                      id='brand'
+                      input={<OutlinedInput label='Thương hiệụ' id='brand' fullWidth size='small' />}
+                    >
+                      <CustomSelectItem>
+                        <Button
+                          fullWidth
+                          color='primary'
+                          onClick={toggleAddBrand}
+                          startIcon={<Plus fontSize='small' />}
+                          sx={{ '&:hover': { backgroundColor: 'transparent' } }}
+                        >
+                          Thêm thương hiệu mới
+                        </Button>
+                      </CustomSelectItem>
+                      {brands.map((brand: CategoryBrandType) => (
+                        <MenuItem key={brand._id} value={brand._id}>
+                          {brand.title}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              />
+              <FormHelperText error={true}>{errors.brand?.message}</FormHelperText>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                control={control}
+                name='importWarehouseDate'
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <DatePickerWrapper>
+                    <DatePicker
+                      selected={value}
+                      showYearDropdown
+                      showMonthDropdown
+                      maxDate={new Date()}
+                      placeholderText='MM-DD-YYYY'
+                      customInput={<CustomInput label='Ngày nhập hàng' />}
+                      id='form-layouts-separator-date'
+                      onChange={onChange}
+                      onBlur={onBlur}
+                    />
+                  </DatePickerWrapper>
+                )}
+              />
+              <FormHelperText error={true}>{errors.importWarehouseDate?.message}</FormHelperText>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                control={control}
+                name='expirationDate'
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <DatePickerWrapper>
+                    <DatePicker
+                      selected={value}
+                      showYearDropdown
+                      showMonthDropdown
+                      minDate={new Date()}
+                      placeholderText='MM-DD-YYYY'
+                      customInput={<CustomInput label='Ngày hết hạn' />}
+                      id='form-layouts-separator-date'
+                      onChange={onChange}
+                      onBlur={onBlur}
+                    />
+                  </DatePickerWrapper>
+                )}
+              />
+              <FormHelperText error={true}>{errors.expirationDate?.message}</FormHelperText>
             </Grid>
             <Grid item xs={12}>
-              <FileUploaderRestrictions title={'Tải lên hình ảnh của sản phẩm'} />
+              <InputLabel>Mô tả sản phẩm</InputLabel>
+              <Controller
+                name={'desc'}
+                control={control}
+                render={({ field: { value, onChange } }) => {
+                  return <EditorCustom value={value} onChange={(text: string) => onChange(text)} />
+                }}
+              />
+              {errors.desc && (
+                <Typography color={'#ff5555'} fontSize={'12px'}>
+                  {errors.desc.message}
+                </Typography>
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <FileUploaderRestrictions title={'Tải lên hình ảnh của sản phẩm'} setFiles={setFiles} files={files} />
             </Grid>
           </Grid>
         </CardContent>

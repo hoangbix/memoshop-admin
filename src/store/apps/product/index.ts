@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-import axios from 'axios'
+import axiosClient from 'src/apiClient/axiosClient'
 
 interface Redux {
   getState: any
@@ -9,7 +9,7 @@ interface Redux {
 }
 
 export const fetchProduct = createAsyncThunk('product/fetchProduct', async () => {
-  const { data } = await axios.get('/api/v1/product')
+  const { data } = await axiosClient.get('/product')
 
   return data
 })
@@ -17,7 +17,7 @@ export const fetchProduct = createAsyncThunk('product/fetchProduct', async () =>
 export const deleteInvoice = createAsyncThunk(
   'product/deleteData',
   async (id: number | string, { dispatch }: Redux) => {
-    const { data } = await axios.delete('/apps/invoice/delete', {
+    const { data } = await axiosClient.delete('/apps/invoice/delete', {
       data: id
     })
     await dispatch(fetchProduct())
