@@ -31,7 +31,6 @@ const MUITableCell = styled(TableCell)<TableCellBaseProps>(({ theme }) => ({
 }))
 
 const PreviewCard = ({ data }: Props) => {
-  console.log(data)
 
   const PreviewRef = useRef(null)
 

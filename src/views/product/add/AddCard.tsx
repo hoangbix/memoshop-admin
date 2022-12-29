@@ -1,4 +1,4 @@
-import { useState, forwardRef, useEffect } from 'react'
+import { forwardRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import DatePicker from 'react-datepicker'
@@ -57,10 +57,9 @@ const AddCard = (props: Props) => {
   const { toggleAddCategory, toggleAddBrand, control, errors } = props
   const dispatch = useDispatch<AppDispatch>()
 
-  const [files, setFiles] = useState<File[]>([])
-
   const { data: categorys } = useSelector((state: RootState) => state.category)
   const { data: brands } = useSelector((state: RootState) => state.brand)
+  const { data: files, isLoading } = useSelector((state: RootState) => state.upload)
 
   useEffect(() => {
     dispatch(fetchCategory())
@@ -68,7 +67,7 @@ const AddCard = (props: Props) => {
   }, [dispatch])
 
   return (
-    <Card>
+    <Card sx={{ mb: '30px' }}>
       <CardContent>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Box
@@ -103,7 +102,7 @@ const AddCard = (props: Props) => {
                     <TextField
                       required
                       size='small'
-                      value={value}
+                      value={value || ''}
                       onChange={onChange}
                       fullWidth
                       label='Tên sản phẩm'
@@ -121,7 +120,7 @@ const AddCard = (props: Props) => {
                 render={({ field: { value, onChange } }) => {
                   return (
                     <TextField
-                      value={value}
+                      value={value || ''}
                       onChange={onChange}
                       required
                       size='small'
@@ -141,7 +140,7 @@ const AddCard = (props: Props) => {
                 render={({ field: { value, onChange } }) => {
                   return (
                     <TextField
-                      value={value}
+                      value={value || ''}
                       onChange={onChange}
                       size='small'
                       fullWidth
@@ -160,7 +159,7 @@ const AddCard = (props: Props) => {
                 render={({ field: { value, onChange } }) => {
                   return (
                     <TextField
-                      value={value}
+                      value={value || ''}
                       onChange={onChange}
                       size='small'
                       fullWidth
@@ -201,7 +200,7 @@ const AddCard = (props: Props) => {
                       </CustomSelectItem>
                       {categorys !== undefined &&
                         categorys.map((category: CategoryBrandType) => (
-                          <MenuItem key={category._id} value={category._id}>
+                          <MenuItem key={category._id} value={category.title}>
                             {category.title}
                           </MenuItem>
                         ))}
@@ -239,7 +238,7 @@ const AddCard = (props: Props) => {
                         </Button>
                       </CustomSelectItem>
                       {brands.map((brand: CategoryBrandType) => (
-                        <MenuItem key={brand._id} value={brand._id}>
+                        <MenuItem key={brand._id} value={brand.title}>
                           {brand.title}
                         </MenuItem>
                       ))}
@@ -309,7 +308,7 @@ const AddCard = (props: Props) => {
               )}
             </Grid>
             <Grid item xs={12}>
-              <FileUploaderRestrictions title={'Tải lên hình ảnh của sản phẩm'} setFiles={setFiles} files={files} />
+              <FileUploaderRestrictions title={'Tải lên hình ảnh của sản phẩm'} files={files} isLoading={isLoading} />
             </Grid>
           </Grid>
         </CardContent>

@@ -12,12 +12,12 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm, Controller } from 'react-hook-form'
 
 import Close from 'mdi-material-ui/Close'
-import { AppDispatch } from 'src/store'
+import { AppDispatch, RootState } from 'src/store'
 import toast from 'react-hot-toast'
 import { useDispatch } from 'react-redux'
 import FileUploaderRestrictions from 'src/@core/components/upload-file/FileUploaderRestrictions'
-import { useState } from 'react'
 import { addBrand } from 'src/store/apps/brand'
+import { useSelector } from 'react-redux'
 
 interface Props {
   open: boolean
@@ -44,7 +44,7 @@ const schema = yup.object().shape({
 
 const AddNewBrand = ({ open, toggle }: Props) => {
   const dispatch = useDispatch<AppDispatch>()
-  const [files, setFiles] = useState<File[]>([])
+  const { data: files } = useSelector((state: RootState) => state.upload)
 
   const {
     reset,
@@ -76,7 +76,6 @@ const AddNewBrand = ({ open, toggle }: Props) => {
   const handleDrawerClose = () => {
     toggle()
     reset({ title: '', desc: '' })
-    setFiles([])
   }
 
   return (
@@ -133,12 +132,7 @@ const AddNewBrand = ({ open, toggle }: Props) => {
           />
           {errors.desc && <FormHelperText sx={{ color: 'error.main' }}>{errors.desc.message}</FormHelperText>}
         </FormControl>
-        <FileUploaderRestrictions
-          title={'Tải lên hình đại diện của thương hiệu'}
-          isSmall
-          setFiles={setFiles}
-          files={files}
-        />
+        <FileUploaderRestrictions title={'Tải lên hình đại diện của thương hiệu'} isSmall files={files} />
         <Box sx={{ mt: '30px' }}>
           <Button type='submit' variant='contained' sx={{ mr: 4 }}>
             Thêm

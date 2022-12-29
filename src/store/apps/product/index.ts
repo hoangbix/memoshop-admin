@@ -1,12 +1,8 @@
-import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import axiosClient from 'src/apiClient/axiosClient'
-
-interface Redux {
-  getState: any
-  dispatch: Dispatch<any>
-}
+import { AddProductType } from 'src/pages/product/add'
+import { ReduxType } from 'src/types/apps'
 
 export const fetchProduct = createAsyncThunk('product/fetchProduct', async () => {
   const { data } = await axiosClient.get('/product')
@@ -14,15 +10,17 @@ export const fetchProduct = createAsyncThunk('product/fetchProduct', async () =>
   return data
 })
 
-export const deleteInvoice = createAsyncThunk(
-  'product/deleteData',
-  async (id: number | string, { dispatch }: Redux) => {
-    const { data } = await axiosClient.delete('/apps/invoice/delete', {
-      data: id
-    })
-    await dispatch(fetchProduct())
+export const addProduct = createAsyncThunk(
+  'product/addProduct',
+  async (payload: AddProductType, { dispatch, rejectWithValue }: ReduxType) => {
+    try {
+      const { data } = await axiosClient.post('/product', payload)
+      await dispatch(fetchProduct())
 
-    return data
+      return data
+    } catch (err: any) {
+      return rejectWithValue(err.response.data)
+    }
   }
 )
 
@@ -30,7 +28,7 @@ export const productSlice = createSlice({
   name: 'product',
   initialState: {
     data: [],
-    total: 1
+    total: 0
   },
   reducers: {},
   extraReducers: builder => {

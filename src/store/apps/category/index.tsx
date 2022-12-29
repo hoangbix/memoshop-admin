@@ -1,13 +1,7 @@
-import { Dispatch } from 'redux'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import axiosClient from 'src/apiClient/axiosClient'
-
-interface Redux {
-  getState: any
-  dispatch: Dispatch<any>
-  rejectWithValue: any
-}
+import { ReduxType } from 'src/types/apps'
 
 export const fetchCategory = createAsyncThunk('category/fetchCategory', async () => {
   const { data } = await axiosClient.get('/prod-category')
@@ -17,7 +11,7 @@ export const fetchCategory = createAsyncThunk('category/fetchCategory', async ()
 
 export const addCategory = createAsyncThunk(
   'category/addCategory',
-  async (params: any, { rejectWithValue, dispatch }: Redux) => {
+  async (params: any, { rejectWithValue, dispatch }: ReduxType) => {
     try {
       const { data } = await axiosClient.post('/prod-category', params)
 

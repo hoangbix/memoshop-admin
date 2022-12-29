@@ -12,10 +12,26 @@ import AddNewCategory from 'src/views/product/add/AddNewCategory'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import AddNewBrand from 'src/views/product/add/AddNewBrand'
+import { useDispatch } from 'react-redux'
+import { AppDispatch, RootState } from 'src/store'
+import { useSelector } from 'react-redux'
+import { addProduct } from 'src/store/apps/product'
+import { UploadImgType } from 'src/types/apps'
+import toast from 'react-hot-toast'
+import { resetUpload } from 'src/store/apps/upload'
+import { useRouter } from 'next/router'
 
 export type AddProductType = {
   title: string
+  desc: string
   price: number
+  quantity: number
+  promotionalPrice: number
+  category: string
+  brand: string
+  importWarehouseDate: Date | null
+  expirationDate: Date | null
+  images: UploadImgType[]
 }
 
 const schema = yup.object().shape({
@@ -32,24 +48,48 @@ const schema = yup.object().shape({
 })
 
 const ProductAdd = () => {
+  const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
+
   const [openAddCategory, setOpenAddCategory] = useState<boolean>(false)
   const [openAddBrand, setOpenAddBrand] = useState<boolean>(false)
 
   const toggleAddCategory = () => setOpenAddCategory(!openAddCategory)
   const toggleAddBrand = () => setOpenAddBrand(!openAddBrand)
 
+  const { data: files } = useSelector((state: RootState) => state.upload)
+
   const {
     control,
     handleSubmit,
+    reset,
     formState: { errors }
   } = useForm<AddProductType>({
     resolver: yupResolver(schema),
     mode: 'onBlur'
   })
-  console.log('errors', errors)
 
-  const onSubmit = (data: any) => {
-    console.log('submit', data)
+  const onSubmit = (data: AddProductType) => {
+    dispatch(
+      addProduct({
+        ...data,
+        images: files
+      })
+    )
+      .unwrap()
+      .then(() => {
+        router.push('/product/list')
+        toast.success('Sản phẩm đã được thêm thành công', {
+          duration: 4000
+        })
+        reset()
+        dispatch(resetUpload())
+      })
+      .catch((err: any) =>
+        toast.error(err.message || 'Có lỗi không xác định xảy ra. Vui lòng thử lại sau ít phút', {
+          duration: 2000
+        })
+      )
   }
 
   return (

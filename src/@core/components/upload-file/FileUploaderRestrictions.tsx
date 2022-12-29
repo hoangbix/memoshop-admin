@@ -11,14 +11,12 @@ import FileDocumentOutline from 'mdi-material-ui/FileDocumentOutline'
 
 import toast from 'react-hot-toast'
 import { useDropzone } from 'react-dropzone'
-import { ImageList, ImageListItem } from '@mui/material'
+import { CircularProgress, ImageList, ImageListItem } from '@mui/material'
 import DropzoneWrapper from './DropzoneWrapper'
-
-interface FileProp {
-  name: string
-  type: string
-  size: number
-}
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from 'src/store'
+import { deleteImg, uploadImg } from 'src/store/apps/upload'
+import { UploadImgType } from 'src/types/apps'
 
 const HeadingTypography = styled(Typography)<TypographyProps>(({ theme }) => ({
   marginBottom: theme.spacing(5),
@@ -30,12 +28,13 @@ const HeadingTypography = styled(Typography)<TypographyProps>(({ theme }) => ({
 interface Props {
   title: string
   isSmall?: boolean
-  files: File[]
-  setFiles: (files: File[]) => void
+  files: UploadImgType[]
+  isLoading?: boolean
 }
 
 const FileUploaderRestrictions = (props: Props) => {
-  const { files = [], setFiles, title, isSmall } = props
+  const { files = [], title, isSmall, isLoading } = props
+  const dispatch = useDispatch<AppDispatch>()
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 5,
@@ -45,7 +44,13 @@ const FileUploaderRestrictions = (props: Props) => {
     },
     multiple: isSmall ? false : true,
     onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)))
+      dispatch(uploadImg(acceptedFiles.map((file: File) => Object.assign(file))))
+        .unwrap()
+        .catch((err: any) =>
+          toast.error(err.message || 'Có lỗi không xác định xảy ra. Vui lòng thử lại sau ít phút', {
+            duration: 2000
+          })
+        )
     },
     onDropRejected: () => {
       toast.error('Bạn chỉ có thể tải lên 5 hình ảnh và kích thước tối đa là 10 MB.', {
@@ -54,18 +59,22 @@ const FileUploaderRestrictions = (props: Props) => {
     }
   })
 
-  const renderFilePreview = (file: FileProp) => {
-    if (file.type.startsWith('image')) {
-      return <img width={150} height={150} alt={file.name} src={URL.createObjectURL(file as any)} />
+  const renderFilePreview = (file: UploadImgType) => {
+    if (file) {
+      return <img width={150} height={150} alt={file.asset_id} src={file.url} />
     } else {
       return <FileDocumentOutline />
     }
   }
 
-  const handleRemoveFile = (file: FileProp) => {
-    const uploadedFiles = files
-    const filtered = uploadedFiles.filter((i: FileProp) => i.name !== file.name)
-    setFiles([...filtered])
+  const handleRemoveFile = (id: string) => {
+    dispatch(deleteImg(id))
+      .unwrap()
+      .catch((err: any) =>
+        toast.error(err.message || 'Có lỗi không xác định xảy ra. Vui lòng thử lại sau ít phút', {
+          duration: 2000
+        })
+      )
   }
 
   return (
@@ -90,24 +99,24 @@ const FileUploaderRestrictions = (props: Props) => {
           </Typography>
         </Box>
       </div>
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: '20px' }}>
+          <CircularProgress color='primary' thickness={2} />
+        </Box>
+      ) : null}
       {files.length ? (
         <Fragment>
           <ImageList cols={3} rowHeight={164}>
             {files.map(file => (
-              <ImageListItem key={file.name}>
-                <ListItem sx={{ alignItems: 'flex-start' }}>
+              <ImageListItem key={file.public_id} sx={{ position: 'relative' }}>
+                <ListItem component={'span'} sx={{ alignItems: 'flex-start' }}>
                   <div className='file-details'>
                     <div className='file-preview'>{renderFilePreview(file)}</div>
-                    <div>
-                      <Typography className='file-name'>{file.name}</Typography>
-                      <Typography className='file-size' variant='body2'>
-                        {Math.round(file.size / 100) / 10 > 1000
-                          ? `${(Math.round(file.size / 100) / 10000).toFixed(1)} mb`
-                          : `${(Math.round(file.size / 100) / 10).toFixed(1)} kb`}
-                      </Typography>
-                    </div>
                   </div>
-                  <IconButton onClick={() => handleRemoveFile(file)}>
+                  <IconButton
+                    onClick={() => handleRemoveFile(file.public_id)}
+                    sx={{ position: 'absolute', top: '5px', right: '10px' }}
+                  >
                     <Close fontSize='small' />
                   </IconButton>
                 </ListItem>
