@@ -27,7 +27,6 @@ code[class*='language-'] {
 
 .ql-editor {
   min-height: 100px !important;
-  max-height: 300px;
   overflow: hidden;
   overflow-y: scroll;
   overflow-x: scroll;

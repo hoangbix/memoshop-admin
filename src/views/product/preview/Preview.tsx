@@ -18,6 +18,7 @@ const InvoicePreview = ({ id }: { id: string }) => {
   const [data, setData] = useState<null | ProductType>(null)
   const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
+  console.log('data', data)
 
   useEffect(() => {
     axios
@@ -49,7 +50,7 @@ const InvoicePreview = ({ id }: { id: string }) => {
         <Grid item xs={12}>
           <Alert severity='error'>
             Invoice with the id: {id} does not exist. Please check the list of invoices:{' '}
-            <Link href='/apps/invoice/list'>Invoice List</Link>
+            <Link href='/product/list'>Invoice List</Link>
           </Alert>
         </Grid>
       </Grid>

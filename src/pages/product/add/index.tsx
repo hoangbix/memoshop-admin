@@ -15,15 +15,15 @@ import AddNewBrand from 'src/views/product/add/AddNewBrand'
 import { useDispatch } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { useSelector } from 'react-redux'
-import { addProduct } from 'src/store/apps/product'
 import { UploadImgType } from 'src/types/apps'
 import toast from 'react-hot-toast'
 import { resetUpload } from 'src/store/apps/upload'
 import { useRouter } from 'next/router'
+import { addProduct } from 'src/store/apps/product/product.thunk'
 
 export type AddProductType = {
   title: string
-  desc: string
+  description: string
   price: number
   quantity: number
   promotionalPrice: number
@@ -36,7 +36,11 @@ export type AddProductType = {
 
 const schema = yup.object().shape({
   title: yup.string().required('Đây là trường bắt buộc').min(3, 'Tối thiểu 3 ký tự').max(74, 'Tối đa 74 ký tự'),
-  desc: yup.string().required('Đây là trường bắt buộc').min(10, 'Tối thiểu 10 ký tự').max(5000, 'Tối đa 5000 ký tự'),
+  description: yup
+    .string()
+    .required('Đây là trường bắt buộc')
+    .min(10, 'Tối thiểu 10 ký tự')
+    .max(5000, 'Tối đa 5000 ký tự'),
   price: yup.number().required('Đây là trường bắt buộc'),
   promotionalPrice: yup.number(),
   quantity: yup.number().required('Đây là trường bắt buộc'),

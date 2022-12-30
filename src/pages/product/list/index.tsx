@@ -22,7 +22,6 @@ import DeleteOutline from 'mdi-material-ui/DeleteOutline'
 import format from 'date-fns/format'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteInvoice } from 'src/store/apps/invoice'
 
 import { RootState, AppDispatch } from 'src/store'
 import { ProductType } from 'src/types/apps/productTypes'
@@ -31,8 +30,9 @@ import TableHeader from 'src/views/product/list/TableHeader'
 
 import 'react-datepicker/dist/react-datepicker.css'
 
-import { fetchProduct } from 'src/store/apps/product'
 import useClipboard from 'src/@core/hooks/useClipboard'
+import { deleteProduct, fetchProduct } from 'src/store/apps/product/product.thunk'
+import ConfirmModal from 'src/@core/components/confirm-modal'
 
 interface CellType {
   row: ProductType
@@ -103,21 +103,26 @@ const defaultColumns = [
   {
     flex: 0.25,
     field: 'title',
-    minWidth: 300,
+    minWidth: 250,
     headerName: 'Sản phẩm',
     renderCell: ({ row }: CellType) => {
-      const { title, description } = row
+      const { title, images } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Link href={`/product/preview/${row._id}`} passHref>
-              <StyledLink>{title}</StyledLink>
-            </Link>
-            <Typography noWrap variant='caption'>
-              {description}
-            </Typography>
-          </Box>
+          {images.length ? (
+            <Box component='img' src={images[0].url} width={50} sx={{ mr: '7px' }} />
+          ) : (
+            <Box
+              component='img'
+              src={'https://res.cloudinary.com/dparfrfjz/image/upload/v1672376632/default-product-image_x6kln8.png'}
+              width={50}
+              sx={{ mr: '7px' }}
+            />
+          )}
+          <Link href={`/product/preview/${row._id}`} passHref>
+            <StyledLink>{title}</StyledLink>
+          </Link>
         </Box>
       )
     }
@@ -129,6 +134,19 @@ const defaultColumns = [
     headerName: 'Giá',
     renderCell: ({ row }: CellType) => (
       <Typography variant='body2'>{(row.price || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}đ</Typography>
+    )
+  },
+  {
+    flex: 0.1,
+    minWidth: 90,
+    field: 'promotionalPrice',
+    headerName: 'Giá khuyến mãi',
+    renderCell: ({ row }: CellType) => (
+      <Typography variant='body2'>
+        {row.promotionalPrice
+          ? `${(row.promotionalPrice || 0).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}đ`
+          : null}
+      </Typography>
     )
   },
   {
@@ -147,20 +165,31 @@ const defaultColumns = [
   },
   {
     flex: 0.15,
-    minWidth: 105,
-    field: 'createdAt',
-    headerName: 'Ngày hết hạn',
+    minWidth: 90,
+    field: 'importWarehouseDate',
+    headerName: 'Ngày nhập hàng',
     renderCell: ({ row }: CellType) => (
-      <Typography variant='body2'>{format(new Date(row.createdAt), 'dd-MM-yyyy')}</Typography>
+      <Typography variant='body2'>{format(new Date(row.importWarehouseDate), 'dd-MM-yyyy') || ''}</Typography>
+    )
+  },
+  {
+    flex: 0.15,
+    minWidth: 90,
+    field: 'expirationDate',
+    headerName: 'Hạn sử dụng',
+    renderCell: ({ row }: CellType) => (
+      <Typography variant='body2'>{format(new Date(row.expirationDate), 'dd-MM-yyyy') || ''}</Typography>
     )
   }
 ]
 
 const InvoiceList = () => {
   const [value, setValue] = useState<string>('')
+  const [productId, setProductId] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
 
   const dispatch = useDispatch<AppDispatch>()
+
   const { data } = useSelector((state: RootState) => state.product)
 
   useEffect(() => {
@@ -169,6 +198,32 @@ const InvoiceList = () => {
 
   const handleFilter = (val: string) => {
     setValue(val)
+  }
+
+  const [open, setOpen] = useState(false)
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
+  const handleOpen = () => {
+    setOpen(true)
+  }
+
+  const confirmHanlder = () => {
+    dispatch(deleteProduct(productId))
+      .unwrap()
+      .then(() => {
+        toast.success('Sản phẩm đã được xoá thành công', {
+          duration: 5000
+        })
+        handleClose()
+      })
+      .catch(err => {
+        toast.error(err.message || 'Có lỗi không xác định xảy ra. Vui lòng thử lại sau ít phút', {
+          duration: 5000
+        })
+      })
   }
 
   const columns = [
@@ -182,7 +237,14 @@ const InvoiceList = () => {
       renderCell: ({ row }: CellType) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title='Xoá sản phẩm'>
-            <IconButton size='small' sx={{ mr: 0.5 }} onClick={() => dispatch(deleteInvoice(row._id))}>
+            <IconButton
+              size='small'
+              sx={{ mr: 0.5 }}
+              onClick={() => {
+                handleOpen()
+                setProductId(row._id)
+              }}
+            >
               <DeleteOutline />
             </IconButton>
           </Tooltip>
@@ -202,27 +264,36 @@ const InvoiceList = () => {
   ]
 
   return (
-    <Card>
-      <TableHeader value={value} handleFilter={handleFilter} />
-      <DataGrid
-        autoHeight
-        pagination
-        rows={data}
-        columns={columns}
-        getRowId={row => row._id}
-        checkboxSelection
-        disableSelectionOnClick
-        pageSize={Number(pageSize)}
-        rowsPerPageOptions={[10, 25, 50]}
-        sx={{ '& .MuiDataGrid-columnHeaders': { borderRadius: 0 } }}
-        onPageSizeChange={newPageSize => setPageSize(newPageSize)}
-        componentsProps={{
-          pagination: {
-            labelRowsPerPage: 'Số hàng trên mỗi trang'
-          }
-        }}
+    <>
+      <Card>
+        <TableHeader value={value} handleFilter={handleFilter} />
+        <DataGrid
+          autoHeight
+          pagination
+          rows={data}
+          columns={columns}
+          getRowId={row => row._id}
+          checkboxSelection
+          disableSelectionOnClick
+          pageSize={Number(pageSize)}
+          rowsPerPageOptions={[10, 25, 50]}
+          sx={{ '& .MuiDataGrid-columnHeaders': { borderRadius: 0 } }}
+          onPageSizeChange={newPageSize => setPageSize(newPageSize)}
+          componentsProps={{
+            pagination: {
+              labelRowsPerPage: 'Số hàng trên mỗi trang'
+            }
+          }}
+        />
+      </Card>
+
+      <ConfirmModal
+        open={open}
+        onClose={handleClose}
+        onConfirm={confirmHanlder}
+        title={'Bạn đang thực hiện xoá sản phẩm'}
       />
-    </Card>
+    </>
   )
 }
 

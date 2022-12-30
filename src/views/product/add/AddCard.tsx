@@ -295,15 +295,28 @@ const AddCard = (props: Props) => {
             <Grid item xs={12}>
               <InputLabel>Mô tả sản phẩm</InputLabel>
               <Controller
-                name={'desc'}
+                name={'description'}
                 control={control}
-                render={({ field: { value, onChange } }) => {
-                  return <EditorCustom value={value} onChange={(text: string) => onChange(text)} />
-                }}
+                render={({ field: { value, onChange } }) => (
+                  <EditorCustom
+                    theme={'snow'}
+                    value={value}
+                    onChange={(text: string) => onChange(text)}
+                    style={{
+                      width: '100%',
+                      height: '210px',
+                      marginBottom: '50px'
+                    }}
+                    formats={formats}
+                    modules={{
+                      toolbar: toolbarOptions
+                    }}
+                  />
+                )}
               />
-              {errors.desc && (
+              {errors.description && (
                 <Typography color={'#ff5555'} fontSize={'12px'}>
-                  {errors.desc.message}
+                  {errors.description.message}
                 </Typography>
               )}
             </Grid>
@@ -318,3 +331,37 @@ const AddCard = (props: Props) => {
 }
 
 export default AddCard
+
+const toolbarOptions = [
+  { header: [1, 2, 3, 4, 5, 6, false] },
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'blockquote',
+  { list: 'ordered' },
+  { list: 'bullet' },
+  { indent: '-1' },
+  { indent: '+1' },
+  { align: '' },
+  { align: 'center' },
+  { align: 'right' },
+  { align: 'justify' },
+  'link',
+  'image'
+]
+
+const formats = [
+  'header',
+  'bold',
+  'italic',
+  'underline',
+  'strike',
+  'blockquote',
+  'list',
+  'bullet',
+  'indent',
+  'link',
+  'image',
+  'align'
+]

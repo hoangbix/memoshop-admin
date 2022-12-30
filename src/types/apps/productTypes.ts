@@ -31,20 +31,34 @@ export type InvoiceType = {
   invoiceStatus: InvoiceStatus
 }
 
+export type ImagesType = {
+  url: string
+  asset_id: string
+  public_id: string
+}
+
+type RatingType = {
+  star: number
+  comment: string
+  postedby: string
+}
+
 export type ProductType = {
-  _id: number
+  _id: string
   title: string
-  brand: number
-  category: string
-  color: string
+  slug: string
   description: string
-  images: any
-  price: string
-  quantity: string
-  ratings: any
-  sold: string
-  totalratings: string
-  createdAt: Date | number
+  price: number
+  promotionalPrice: number
+  category: string
+  brand: string
+  quantity: number
+  sold: number
+  images: ImagesType[]
+  ratings: RatingType[]
+  totalratings: number
+  importWarehouseDate: Date
+  expirationDate: Date
 }
 
 export type InvoicePaymentType = {

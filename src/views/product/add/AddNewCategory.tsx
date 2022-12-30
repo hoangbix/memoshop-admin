@@ -26,7 +26,7 @@ interface Props {
 
 interface FormData {
   title: string
-  desc: string
+  description: string
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -39,7 +39,11 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const schema = yup.object().shape({
   title: yup.string().required('Đây là trường bắt buộc').min(3, 'Tối thiểu 3 ký tự'),
-  desc: yup.string().required('Đây là trường bắt buộc').min(10, 'Tối thiểu 3 ký tự').max(5000, 'Tối đa 5000 ký tự')
+  description: yup
+    .string()
+    .required('Đây là trường bắt buộc')
+    .min(10, 'Tối thiểu 3 ký tự')
+    .max(5000, 'Tối đa 5000 ký tự')
 })
 
 const AddNewCategory = ({ open, toggle }: Props) => {
@@ -102,7 +106,7 @@ const AddNewCategory = ({ open, toggle }: Props) => {
               <TextField
                 size='small'
                 label='Tên danh mục'
-                value={value}
+                value={value || ''}
                 variant='outlined'
                 onChange={onChange}
                 error={Boolean(errors.title)}
@@ -113,25 +117,27 @@ const AddNewCategory = ({ open, toggle }: Props) => {
         </FormControl>
         <FormControl fullWidth sx={{ mb: 6 }}>
           <Controller
-            name='desc'
+            name='description'
             control={control}
             rules={{ required: true }}
             render={({ field: { value, onChange } }) => (
               <TextField
                 size='small'
                 label='Mô tả danh mục'
-                value={value}
+                value={value || ''}
                 rows={3}
                 fullWidth
                 multiline
                 id='invoice-note'
                 sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
                 onChange={onChange}
-                error={Boolean(errors.desc)}
+                error={Boolean(errors.description)}
               />
             )}
           />
-          {errors.desc && <FormHelperText sx={{ color: 'error.main' }}>{errors.desc.message}</FormHelperText>}
+          {errors.description && (
+            <FormHelperText sx={{ color: 'error.main' }}>{errors.description.message}</FormHelperText>
+          )}
         </FormControl>
         <FileUploaderRestrictions title={'Tải lên hình đại diện của danh mục'} isSmall files={files} />
         <Box sx={{ mt: '30px' }}>
