@@ -15,7 +15,7 @@ import ReactToPdf from 'react-to-pdf'
 
 import { ProductType } from 'src/types/apps/productTypes'
 import LogoIcon from 'src/@core/layouts/components/shared-components/logo'
-import { List, ListItem, Rating } from '@mui/material'
+import { Rating } from '@mui/material'
 import EditorCustom from 'src/@core/components/editor-custom'
 import { format } from 'date-fns'
 import ConfirmModal from 'src/@core/components/confirm-modal'
@@ -238,37 +238,45 @@ const PreviewCard = ({ data }: Props) => {
                       />
                     ) : null}
 
-                    <Box sx={{ display: 'flex', gap: '30px', fontWeight: 600 }}>
-                      <List>
-                        <ListItem sx={{ mb: '5px', gap: '5px', paddingLeft: 0 }}>
+                    <Grid container spacing={5} sx={{ mt: '30px' }}>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
                           Nhà cung cấp: <span style={{ color: '#3BB77E' }}>{data.brand}</span>
-                        </ListItem>
-                        <ListItem sx={{ mb: '5px', gap: '5px', paddingLeft: 0 }}>
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
                           Ngày nhập hàng:{' '}
                           <span style={{ color: '#3BB77E' }}>
                             {format(new Date(data.importWarehouseDate), 'dd-MM-yyyy') || ''}
                           </span>
-                        </ListItem>
-                        <ListItem sx={{ mb: '5px', gap: '5px', paddingLeft: 0 }}>
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
                           Hạn sử dụng:{' '}
                           <span style={{ color: '#3BB77E' }}>
                             {' '}
                             {format(new Date(data.expirationDate), 'dd-MM-yyyy') || ''}
                           </span>
-                        </ListItem>
-                      </List>
-                      <List>
-                        <ListItem sx={{ mb: '5px', gap: '5px', paddingLeft: 0 }}>
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
                           Danh mục: <span style={{ color: '#3BB77E' }}>{data.category}</span>
-                        </ListItem>
-                        <ListItem sx={{ mb: '5px', gap: '5px', paddingLeft: 0 }}>
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
                           Kho hàng: <span style={{ color: '#3BB77E' }}>{data.quantity} sản phẩm</span>
-                        </ListItem>
-                        <ListItem sx={{ mb: '5px', gap: '5px', paddingLeft: 0 }}>
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography>
                           SKU: <span style={{ color: '#3BB77E' }}>JGHG878LA51</span>
-                        </ListItem>
-                      </List>
-                    </Box>
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </Box>
                 </Grid>
               </Grid>
@@ -294,11 +302,20 @@ const PreviewCard = ({ data }: Props) => {
             ) : null}
           </Box>
           <CardContent>
-            <Box sx={{ mt: 0, width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+            <Box
+              sx={{
+                mt: 0,
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-end',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: '10px'
+              }}
+            >
               <ReactToPdf scale={0.75} targetRef={PreviewRef} filename={`memo-product-${data._id}.pdf`}>
                 {({ toPdf }: { toPdf: () => void }) => {
                   return (
-                    <Button variant='contained' color='success' onClick={toPdf} sx={{ mr: 4 }}>
+                    <Button variant='contained' color='success' onClick={toPdf} sx={{ mr: { xs: 0, sm: 4 } }}>
                       Xuất file PDF
                     </Button>
                   )
@@ -306,7 +323,7 @@ const PreviewCard = ({ data }: Props) => {
               </ReactToPdf>
 
               <Link href={`/product/edit/${data._id}`} passHref>
-                <Button sx={{ mr: 4 }} target='_blank' component='a' variant='contained'>
+                <Button sx={{ mr: { xs: 0, sm: 4 } }} target='_blank' component='a' variant='contained'>
                   Chỉnh sửa
                 </Button>
               </Link>
