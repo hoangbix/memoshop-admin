@@ -29,6 +29,7 @@ import FileUploaderRestrictions from 'src/@core/components/upload-file/FileUploa
 import { fetchBrand } from 'src/store/apps/brand'
 import { AppDispatch, RootState } from 'src/store'
 import EditorCustom from 'src/@core/components/editor-custom'
+import Link from 'next/link'
 
 interface Props {
   toggleAddCategory: () => void
@@ -79,7 +80,9 @@ const AddCard = (props: Props) => {
               flexDirection: { xs: 'column', lg: 'row' }
             }}
           >
-            <LogoIcon />
+            <Link href='/' passHref>
+              <LogoIcon />
+            </Link>
             <Typography variant='h6' sx={{ mt: '20px' }}>
               Thêm mới sản phẩm
             </Typography>

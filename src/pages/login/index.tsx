@@ -175,7 +175,9 @@ const LoginPage = () => {
                 justifyContent: 'center'
               }}
             >
+              <Link href='/' passHref>
               <LogoIcon />
+              </Link>
             </Box>
             <Box sx={{ mb: 6 }}>
               <TypographyStyled variant='h5'>{`Chào mừng bạn đến ${themeConfig.templateName}! 👋🏻`}</TypographyStyled>

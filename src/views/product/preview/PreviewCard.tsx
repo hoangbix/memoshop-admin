@@ -74,7 +74,9 @@ const PreviewCard = ({ data }: Props) => {
             <CardContent>
               <Grid container sx={{ alignItems: 'center' }}>
                 <Grid item sm={6} xs={12} sx={{ mb: { sm: 0, xs: 4 } }}>
-                  <LogoIcon width={150} />
+                  <Link href='/'>
+                    <LogoIcon width={150} />
+                  </Link>
                 </Grid>
                 <Grid item sm={6} xs={12}>
                   <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>

@@ -8,7 +8,7 @@ const getLocalStorage = (key: string) => {
 }
 
 const axiosClient = axios.create({
-  baseURL: '/api/v1',
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
   headers: {
     'Content-Type': 'application/json',
     Authorization: 'Bearer ' + getLocalStorage(authConfig.storageTokenKeyName)

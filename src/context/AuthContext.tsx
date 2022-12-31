@@ -2,13 +2,12 @@ import { createContext, useEffect, useState, ReactNode } from 'react'
 
 import { useRouter } from 'next/router'
 
-import axios from 'axios'
-
 import jwt from 'jsonwebtoken'
 
 import authConfig from 'src/configs/auth'
 
 import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataType } from './types'
+import axiosClient from 'src/apiClient/axiosClient'
 
 const defaultProvider: AuthValuesType = {
   user: null,
@@ -48,7 +47,7 @@ const AuthProvider = ({ children }: Props) => {
         if (decoded) {
           // @ts-ignore
           const { id: userId } = decoded.payload
-          await axios
+          await axiosClient
             .get(`${authConfig.meEndpoint}/${userId}`, {
               headers: {
                 Authorization: `Bearer ${storedToken}`
@@ -76,7 +75,7 @@ const AuthProvider = ({ children }: Props) => {
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
     setLoadingBtn(true)
 
-    axios
+    axiosClient
       .post(authConfig.loginEndpoint, params)
       .then(async res => {
         window.localStorage.setItem(authConfig.storageTokenKeyName, res.data.access_token)
@@ -89,7 +88,7 @@ const AuthProvider = ({ children }: Props) => {
           // @ts-ignore
           const { id: userId } = decoded.payload
 
-          axios
+          axiosClient
             .get(`${authConfig.meEndpoint}/${userId}`, {
               headers: {
                 Authorization: `Bearer ${token}`
@@ -127,7 +126,7 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const handleRegister = (params: RegisterParams, errorCallback?: ErrCallbackType) => {
-    axios
+    axiosClient
       .post(authConfig.registerEndpoint, params)
       .then(res => {
         if (res.data.error) {

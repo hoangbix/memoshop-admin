@@ -5,24 +5,23 @@ import Link from 'next/link'
 import Grid from '@mui/material/Grid'
 import Alert from '@mui/material/Alert'
 
-import axios from 'axios'
-
 import { ProductType } from 'src/types/apps/productTypes'
 
 import PreviewCard from 'src/views/product/preview/PreviewCard'
 import AddPaymentDrawer from 'src/views/product/shared-drawer/AddPaymentDrawer'
 import SendInvoiceDrawer from 'src/views/product/shared-drawer/SendInvoiceDrawer'
 
+import axiosClient from 'src/apiClient/axiosClient'
+
 const InvoicePreview = ({ id }: { id: string }) => {
   const [error, setError] = useState<boolean>(false)
   const [data, setData] = useState<null | ProductType>(null)
   const [addPaymentOpen, setAddPaymentOpen] = useState<boolean>(false)
   const [sendInvoiceOpen, setSendInvoiceOpen] = useState<boolean>(false)
-  console.log('data', data)
 
   useEffect(() => {
-    axios
-      .get(`/api/v1/product/${id}`)
+    axiosClient
+      .get(`/product/${id}`)
       .then(res => {
         setData(res.data)
         setError(false)
@@ -49,8 +48,8 @@ const InvoicePreview = ({ id }: { id: string }) => {
       <Grid container spacing={6}>
         <Grid item xs={12}>
           <Alert severity='error'>
-            Invoice with the id: {id} does not exist. Please check the list of invoices:{' '}
-            <Link href='/product/list'>Invoice List</Link>
+            Sản phẩm có id: {id} không tồn tại. Vui lòng kiểm tra danh sách sản phẩm:{' '}
+            <Link href='/product/list'>Danh sách sản phẩm</Link>
           </Alert>
         </Grid>
       </Grid>

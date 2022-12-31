@@ -1,6 +1,6 @@
 export default {
-  meEndpoint: '/api/v1/user',
-  loginEndpoint: '/api/v1/auth/admin-login',
-  registerEndpoint: '/api/v1/auth/register',
+  meEndpoint: '/user',
+  loginEndpoint: '/auth/admin-login',
+  registerEndpoint: '/auth/register',
   storageTokenKeyName: 'access_token'
 }
