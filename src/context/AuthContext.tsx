@@ -48,19 +48,15 @@ const AuthProvider = ({ children }: Props) => {
           // @ts-ignore
           const { id: userId } = decoded.payload
           await axiosClient
-            .get(`${authConfig.meEndpoint}/${userId}`, {
-              headers: {
-                Authorization: `Bearer ${storedToken}`
-              }
-            })
+            .get(`${authConfig.meEndpoint}/${userId}`)
             .then(async response => {
               setLoading(false)
-              setUser({ ...response.data })
+              setUser(response.data)
             })
             .catch(() => {
               localStorage.removeItem('userData')
               localStorage.removeItem('refreshToken')
-              localStorage.removeItem('accessToken')
+              localStorage.removeItem('access_token')
               setUser(null)
               setLoading(false)
             })
@@ -97,7 +93,7 @@ const AuthProvider = ({ children }: Props) => {
             .then(async response => {
               const returnUrl = router.query.returnUrl
 
-              setUser({ ...response.data })
+              setUser(response.data)
               await window.localStorage.setItem('userData', JSON.stringify(response.data))
 
               const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
