@@ -4,8 +4,6 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import { useTheme } from '@mui/material/styles'
 
 interface Props {
   open: boolean
@@ -17,11 +15,8 @@ interface Props {
 const ConfirmModal = (props: Props) => {
   const { open, onClose, title, onConfirm } = props
 
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
-
   return (
-    <Dialog fullScreen={fullScreen} open={open} onClose={onClose} aria-labelledby='responsive-dialog-title'>
+    <Dialog open={open} onClose={onClose} aria-labelledby='responsive-dialog-title'>
       <DialogTitle id='responsive-dialog-title'>{title || 'Xoá'}</DialogTitle>
       <DialogContent>
         <DialogContentText>Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xoá không?</DialogContentText>
