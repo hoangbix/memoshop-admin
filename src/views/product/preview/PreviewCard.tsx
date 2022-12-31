@@ -75,7 +75,9 @@ const PreviewCard = ({ data }: Props) => {
               <Grid container sx={{ alignItems: 'center' }}>
                 <Grid item sm={6} xs={12} sx={{ mb: { sm: 0, xs: 4 } }}>
                   <Link href='/'>
-                    <LogoIcon width={150} />
+                    <Box component={'a'} sx={{ cursor: 'pointer' }}>
+                      <LogoIcon width={150} />
+                    </Box>
                   </Link>
                 </Grid>
                 <Grid item sm={6} xs={12}>

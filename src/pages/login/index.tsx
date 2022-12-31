@@ -176,7 +176,9 @@ const LoginPage = () => {
               }}
             >
               <Link href='/' passHref>
-              <LogoIcon />
+                <Box component={'a'} sx={{ cursor: 'pointer' }}>
+                  <LogoIcon />
+                </Box>
               </Link>
             </Box>
             <Box sx={{ mb: 6 }}>

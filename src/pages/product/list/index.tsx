@@ -183,7 +183,7 @@ const defaultColumns = [
   }
 ]
 
-const InvoiceList = () => {
+const ProductList = () => {
   const [value, setValue] = useState<string>('')
   const [productId, setProductId] = useState<string>('')
   const [pageSize, setPageSize] = useState<number>(10)
@@ -297,4 +297,4 @@ const InvoiceList = () => {
   )
 }
 
-export default InvoiceList
+export default ProductList

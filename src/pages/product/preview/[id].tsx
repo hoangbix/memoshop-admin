@@ -1,35 +1,35 @@
-import { GetStaticPaths, GetStaticProps, GetStaticPropsContext, InferGetStaticPropsType } from 'next/types'
-
-import axios from 'axios'
-
-import { ProductType } from 'src/types/apps/productTypes'
+import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from 'next/types'
 
 import Preview from 'src/views/product/preview/Preview'
+import { ProductType } from 'src/types/apps/productTypes'
+import axiosClient from 'src/apiClient/axiosClient'
 
-const InvoicePreview = ({ id }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  return <Preview id={id} />
+const ProductPreview = (data: ProductType) => {
+  return <Preview data={data} />
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await axios.get(`https://api-memeshop.herokuapp.com/api/v1/product`)
+  const res = await axiosClient.get('/product')
   const data: ProductType[] = await res.data
 
   const paths = data.map((item: ProductType) => ({
-    params: { id: `${item._id}` }
+    params: { id: item._id }
   }))
 
   return {
     paths,
-    fallback: false
+    fallback: 'blocking'
   }
 }
 
-export const getStaticProps: GetStaticProps = ({ params }: GetStaticPropsContext) => {
+export const getStaticProps: GetStaticProps = async ({ params }: GetStaticPropsContext) => {
+  const res = await axiosClient.get(`/product/${params?.id}`)
+  const data: ProductType = await res.data
+
   return {
-    props: {
-      id: params?.id
-    }
+    props: data,
+    revalidate: 5
   }
 }
 
-export default InvoicePreview
+export default ProductPreview

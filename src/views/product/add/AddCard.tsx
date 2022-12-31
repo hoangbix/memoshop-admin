@@ -81,7 +81,9 @@ const AddCard = (props: Props) => {
             }}
           >
             <Link href='/' passHref>
-              <LogoIcon />
+              <Box component={'a'} sx={{ cursor: 'pointer' }}>
+                <LogoIcon />
+              </Box>
             </Link>
             <Typography variant='h6' sx={{ mt: '20px' }}>
               Thêm mới sản phẩm
