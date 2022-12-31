@@ -11,7 +11,7 @@ const InvoicePreview = ({ id }: InferGetStaticPropsType<typeof getStaticProps>) 
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const res = await axios.get(`https://api-memeshop.herokuapp.com/api/v1/product`)
+  const res = await axios.get(`${process.env.API_URL}/api/v1/product`)
   const data: ProductType[] = await res.data
 
   const paths = data.map((item: ProductType) => ({
