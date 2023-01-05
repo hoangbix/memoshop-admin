@@ -24,6 +24,7 @@ import { addProduct } from 'src/store/apps/product/product.thunk'
 export type AddProductType = {
   title: string
   description: string
+  shortDesc: string
   price: number
   quantity: number
   promotionalPrice: number
@@ -32,6 +33,8 @@ export type AddProductType = {
   importWarehouseDate: Date | null
   expirationDate: Date | null
   images: UploadImgType[]
+  isHot: boolean
+  isSelling: boolean
 }
 
 const schema = yup.object().shape({
@@ -41,6 +44,7 @@ const schema = yup.object().shape({
     .required('Đây là trường bắt buộc')
     .min(10, 'Tối thiểu 10 ký tự')
     .max(5000, 'Tối đa 5000 ký tự'),
+  shortDesc: yup.string().required('Đây là trường bắt buộc').min(10, 'Tối thiểu 10 ký tự').max(300, 'Tối đa 300 ký tự'),
   price: yup.number().required('Đây là trường bắt buộc'),
   promotionalPrice: yup.number(),
   quantity: yup.number().required('Đây là trường bắt buộc'),
@@ -57,6 +61,11 @@ const ProductAdd = () => {
 
   const [openAddCategory, setOpenAddCategory] = useState<boolean>(false)
   const [openAddBrand, setOpenAddBrand] = useState<boolean>(false)
+
+  const [state, setState] = useState({
+    isHot: false,
+    isSelling: false
+  })
 
   const toggleAddCategory = () => setOpenAddCategory(!openAddCategory)
   const toggleAddBrand = () => setOpenAddBrand(!openAddBrand)
@@ -77,7 +86,9 @@ const ProductAdd = () => {
     dispatch(
       addProduct({
         ...data,
-        images: files
+        images: files,
+        isHot: state.isHot,
+        isSelling: state.isSelling
       })
     )
       .unwrap()
@@ -108,7 +119,7 @@ const ProductAdd = () => {
           />
         </Grid>
         <Grid item xl={3} md={4} xs={12}>
-          <AddActions onSubmit={handleSubmit(onSubmit)} />
+          <AddActions onSubmit={handleSubmit(onSubmit)} setState={setState} state={state} />
         </Grid>
       </Grid>
       <AddNewCategory open={openAddCategory} toggle={toggleAddCategory} />

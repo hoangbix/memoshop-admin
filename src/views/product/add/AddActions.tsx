@@ -8,6 +8,7 @@ import CardContent from '@mui/material/CardContent'
 
 import SendOutline from 'mdi-material-ui/SendOutline'
 import { useRouter } from 'next/router'
+import { ChangeEvent } from 'react'
 
 const OptionsWrapper = styled(Box)<BoxProps>(() => ({
   display: 'flex',
@@ -17,12 +18,24 @@ const OptionsWrapper = styled(Box)<BoxProps>(() => ({
 
 interface Props {
   onSubmit: () => void
+  state: {
+    isHot: boolean
+    isSelling: boolean
+  }
+  setState: (state: { isHot: boolean; isSelling: boolean }) => void
 }
 
 const AddActions = (props: Props) => {
-  const { onSubmit } = props
+  const { onSubmit, setState, state } = props
 
   const router = useRouter()
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setState({
+      ...state,
+      [event.target.name]: event.target.checked
+    })
+  }
 
   return (
     <Box>
@@ -37,22 +50,16 @@ const AddActions = (props: Props) => {
         </CardContent>
       </Card>
       <OptionsWrapper sx={{ mb: 1 }}>
-        <InputLabel
-          htmlFor='invoice-add-payment-terms'
-          sx={{ cursor: 'pointer', fontSize: '0.875rem', color: 'text.secondary' }}
-        >
+        <InputLabel htmlFor='isHot' sx={{ cursor: 'pointer', fontSize: '0.875rem', color: 'text.secondary' }}>
           Sản phẩm nổi bật
         </InputLabel>
-        <Switch id='invoice-add-payment-terms' />
+        <Switch id='isHot' onChange={handleChange} name='isHot' />
       </OptionsWrapper>
       <OptionsWrapper sx={{ mb: 1 }}>
-        <InputLabel
-          htmlFor='invoice-add-client-notes'
-          sx={{ cursor: 'pointer', fontSize: '0.875rem', color: 'text.secondary' }}
-        >
+        <InputLabel htmlFor='isSelling' sx={{ cursor: 'pointer', fontSize: '0.875rem', color: 'text.secondary' }}>
           Sản phẩm bán chạy
         </InputLabel>
-        <Switch id='invoice-add-client-notes' />
+        <Switch id='isSelling' onChange={handleChange} name='isSelling' />
       </OptionsWrapper>
     </Box>
   )

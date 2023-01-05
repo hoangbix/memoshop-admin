@@ -297,6 +297,34 @@ const AddCard = (props: Props) => {
               />
               <FormHelperText error={true}>{errors.expirationDate?.message}</FormHelperText>
             </Grid>
+
+            <Grid item xs={12}>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='shortDesc'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <TextField
+                      size='small'
+                      label='Mô tả ngắn'
+                      value={value || ''}
+                      rows={3}
+                      fullWidth
+                      multiline
+                      id='invoice-note'
+                      sx={{ '& .MuiInputBase-input': { color: 'text.secondary' } }}
+                      onChange={onChange}
+                      error={Boolean(errors.shortDesc)}
+                    />
+                  )}
+                />
+                {errors.shortDesc && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.shortDesc.message}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+
             <Grid item xs={12}>
               <InputLabel>Mô tả sản phẩm</InputLabel>
               <Controller
@@ -325,6 +353,7 @@ const AddCard = (props: Props) => {
                 </Typography>
               )}
             </Grid>
+
             <Grid item xs={12}>
               <FileUploaderRestrictions title={'Tải lên hình ảnh của sản phẩm'} files={files} isLoading={isLoading} />
             </Grid>

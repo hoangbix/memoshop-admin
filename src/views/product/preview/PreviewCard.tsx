@@ -231,16 +231,21 @@ const PreviewCard = ({ data }: Props) => {
                         </Typography>
                       )}
                     </Box>
-                    {data.description ? (
-                      <EditorCustom
-                        readOnly
-                        theme={'bubble'}
-                        modules={{
-                          toolbar: false
-                        }}
-                        value={data.description.slice(0, 200)}
-                      />
-                    ) : null}
+                    <Typography
+                      gutterBottom
+                      height={'55px'}
+                      sx={{
+                        color: '#253D4E',
+                        fontSize: '14px',
+                        display: '-webkit-box',
+                        overflow: 'hidden',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 3,
+                        mb: '10px'
+                      }}
+                    >
+                      {data.shortDesc}
+                    </Typography>
 
                     <Grid container spacing={5} sx={{ mt: '30px' }}>
                       <Grid item xs={12} md={6}>

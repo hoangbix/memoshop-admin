@@ -48,6 +48,7 @@ export type ProductType = {
   title: string
   slug: string
   description: string
+  shortDesc: string
   price: number
   promotionalPrice: number
   category: string
