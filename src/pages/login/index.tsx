@@ -95,11 +95,6 @@ const schema = yup.object().shape({
   password: yup.string().min(4).required()
 })
 
-const defaultValues = {
-  password: '1234',
-  email: 'hoangbily@gmail.com'
-}
-
 interface FormData {
   email: string
   password: string
@@ -121,7 +116,6 @@ const LoginPage = () => {
     handleSubmit,
     formState: { errors }
   } = useForm({
-    defaultValues,
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
@@ -199,7 +193,7 @@ const LoginPage = () => {
                       onBlur={onBlur}
                       onChange={onChange}
                       error={Boolean(errors.email)}
-                      placeholder='admin@materialize.com'
+                      placeholder='admin@memoshop.com'
                     />
                   )}
                 />
